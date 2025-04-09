@@ -5,11 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = "~=3.10"
 dependencies = [
+    "ipython>=8.35.0",
+    "jupyter>=1.1.1",
     "matplotlib>=3.10.1",
-    "numpy>=2.2.4",
+    "numpy==1.26.4",
     "pandas>=1.5.3",
     "pip>=25.0.1",
-    "pyhealth>=1.1.6",
+    "pyhealth==1.1.4",
     "scikit-learn>=1.6.1",
     "torch>=2.6.0",
 ]
