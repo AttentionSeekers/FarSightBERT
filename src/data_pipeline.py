@@ -9,6 +9,7 @@ Created on 2025-04-01 12:25:06 Tuesday
 import os, sys
 import argparse
 import data as step
+import pandas as pd
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name')
@@ -18,7 +19,10 @@ args = parser.parse_args()
 if args.name == None:
     print('No argument passed! Skipping execution.')
 
-    print('\nPlease select an argument.\nAvailable arguments:\n1. `make_data` : Raw data preparation\n2. `aggregate`: Farsight aggregation')
+    print('\nPlease select an argument.\
+        \nAvailable arguments:\n1. `make_data` : Raw data preparation\
+        \n2. `preprocess`: Preprocess and clean text\
+            ')
 
 if args.name == 'make_data': #step1-3
     print('Executing steps 1-3...')
@@ -50,7 +54,7 @@ if args.name == 'make_data': #step1-3
     print(f'\nSaving to {os.path.join(mimic3_path, "raw_notes.csv")}')
     notes.to_csv(os.path.join(mimic3_path, 'raw_notes.csv'))
 
-if args.name == 'aggregate':
+if args.name == 'preprocess':
     mimic3_path = 'data/'
 
     if os.path.exists(os.path.join(mimic3_path, 'raw_notes.csv')):
@@ -59,6 +63,21 @@ if args.name == 'aggregate':
         print('Data not found, first prepare data using `make_data`!')
         sys.exit(1)
 
-    
-    print('Under construction')
+    print('\nStep 4.1: Preprocessing and Cleaning Text.')
+    notes['PTEXT'] = notes['TEXT'].apply(step.preprocess_and_clean_text)
+    print('\nStep 4.2: Remove rare tokens (<10).')
+    notes = step.remove_rare(notes)
 
+    print(f'\nSaving to {os.path.join(mimic3_path, "cleaned_notes.csv")}')
+    notes.to_csv(os.path.join(mimic3_path, 'cleaned_notes.csv'))
+
+if args.name == 'add_targets':
+    mimic3_path = 'data/'
+
+    if os.path.exists(os.path.join(mimic3_path, 'cleaned_notes.csv')):
+        notes = pd.read_csv(f'{os.path.join(mimic3_path, "cleaned_notes.csv")}')
+    else:
+        print('Data not found, first clean data using `preprocess`!')
+        sys.exit(1)
+
+    print('Under construction')

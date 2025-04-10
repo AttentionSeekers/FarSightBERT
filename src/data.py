@@ -7,6 +7,7 @@ Created on 2025-03-31 10:10:50 Monday
 """
 
 import pandas as pd
+import re
 import nltk
 import os
 
@@ -139,19 +140,89 @@ def filter_nursing_notes(notes:pd.DataFrame)->pd.DataFrame:
        
     return notes
 
+# step 4.1 preprocess and clean
+def preprocess_and_clean_text(text:str)->list:
+    from nltk.corpus import stopwords
+    from nltk.tokenize import word_tokenize
+    from nltk.stem import PorterStemmer, WordNetLemmatizer
 
-# # step 4
-# def preprocess()->?:
-#     # tokenize
-#     from nltk.tokenize import word_tokenize
-#     tokens = word_tokenize()
-#     # remove stopwords
-#     # stem
-#     # lemmatize
+    # required nltk resources
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('wordnet')
 
-#     return #TODO
+    # all comments contain direct quotes from the paper
+    
+    # First, we removed multiple spaces and special characters."
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^\w\s\/\-]', ' ', text) 
 
-# # step 5
+    # "References to images (e.g., MRI_Scan.jpeg) were removed, and
+    # character case folding was performed."
+    text = text.lower()
+
+    # "We employed the NLTK tokenizer to facilitate the tokenization of nursing text."
+    tokens = word_tokenize(text)
+
+    # "Utilizing the NLTK English stopword corpus, we removed
+    # stopwords from the generated tokens."
+    stopwords = set(stopwords.words('english'))
+    tokens = [token for token in tokens if token not in stopwords]
+    
+    # forgot image references!
+    # "References to images (e.g., MRI_Scan.jpeg) were removed, and
+    # character case folding was performed." 
+    tokens = [token for token in tokens if not token.endswith(('.jpeg', '.jpg', '.png', '.gif'))]
+
+    # "Before any further processing, medical concept normalization
+    # through disambiguation of abbreviations (into their respective
+    # long forms) was facilitated using CARD, an open-source framework
+    # for clinical abbreviation recognition and disambiguation."
+
+    # CARD-2 framework no longer available
+    # https://sbmi.uth.edu/ccb/resources/abbreviation.htm
+    # need to find an alternative or just skip this
+    # TODO
+
+    # "Lastly, suffix stripping was performed through stemming,
+    # followed by lemmatization for the conversion of the stripped
+    # tokens into their respective base forms."
+    stemmer = PorterStemmer()
+    lemmatizer = WordNetLemmatizer()
+    processed_tokens = []
+    for token in tokens:
+        stemmed = stemmer.stem(token)
+        lemmatized = lemmatizer.lemmatize(stemmed)
+        processed_tokens.append(lemmatized)
+
+    return processed_tokens
+
+# step 4.2
+def remove_rare(df:pd.DataFrame)->pd.DataFrame:
+    # "Additionally, we eliminated the tokens appearing in less than
+    # ten nursing notes (e.g., spot, cope, and inch) in order to
+    # lower the computational complexity of training (the total
+    # number of tokens pre- and post-elimination were 188,742 and 32
+    # 687 respectively) and mitigate problems arising due to
+    # overfitting."
+    alltokens = []
+    for t in df['PTEXT']:
+        alltokens.extend(t)
+
+    tokencounts = pd.Series(alltokens).value_counts()
+
+    # tokens less than 10
+    rare = tokencounts[tokencounts<10].index.tolist()
+
+    # UDF
+    def filter(tlist:list)->list:
+        return [t for t in tlist if t not in rare]
+
+    df['FTEXT'] = df['PTEXT'].apply(filter)
+
+    return df
+
+# # step 5 --> target labels
 # def farsight_aggregation()->?:
 #     # each note is assigned all diagnostic codes from future notes 
 #     # attaching the full label set to each note for multi-label prediction.
