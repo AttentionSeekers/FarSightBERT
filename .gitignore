@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 .DS_Store
 src/data/NOTEEVENTS.csv.gz
+src/data/raw_notes.csv
+src/data/NOTEEVENTS.csv
