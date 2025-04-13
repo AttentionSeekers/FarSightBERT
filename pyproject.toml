@@ -1,7 +1,7 @@
 [project]
-name = "code"
-version = "0.1.0"
-description = "Add your description here"
+name = "nlpvise"
+version = "1.0.0"
+description = "This project is completed as a part of final project for CSE6250 BD4H. This projects replicates paper https://ieeexplore.ieee.org/document/9007352 and combines the various models mentioned in the paper in a Mixture of Model system and access the impact on model performance."
 readme = "README.md"
 requires-python = "~=3.10"
 dependencies = [
