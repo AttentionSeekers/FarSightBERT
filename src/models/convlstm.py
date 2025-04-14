@@ -20,9 +20,9 @@ from torch import nn
     # sigmoid
 
 
-class conv_lstm(nn.Module):
+class ConvLSTM(nn.Module):
     def __init__(self, input_size):
-        super(conv_lstm, self).__init__()
+        super(ConvLSTM, self).__init__()
         self.fc1 = nn.Linear(input_size, 289)
         self.conv1 = nn.Conv2d(1, 19, kernel_size=3)
         self.fc2 = nn.Linear(19 * 225, 289)
