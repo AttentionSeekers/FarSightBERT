@@ -146,17 +146,8 @@ def preprocess_and_clean_text(text:str)->list:
     from nltk.tokenize import word_tokenize
     from nltk.stem import PorterStemmer, WordNetLemmatizer
 
-    # required nltk resources
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    nltk.download('wordnet')
-
     # all comments contain direct quotes from the paper
     
-    # First, we removed multiple spaces and special characters."
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'[^\w\s\/\-]', ' ', text) 
-
     # "References to images (e.g., MRI_Scan.jpeg) were removed, and
     # character case folding was performed."
     text = text.lower()
@@ -168,6 +159,9 @@ def preprocess_and_clean_text(text:str)->list:
     # stopwords from the generated tokens."
     stopwords = set(stopwords.words('english'))
     tokens = [token for token in tokens if token not in stopwords]
+
+    # First, we removed multiple spaces and special characters."
+    tokens = [token for token in tokens if token.isalnum()]
     
     # forgot image references!
     # "References to images (e.g., MRI_Scan.jpeg) were removed, and
@@ -205,24 +199,26 @@ def remove_rare(df:pd.DataFrame)->pd.DataFrame:
     # number of tokens pre- and post-elimination were 188,742 and 32
     # 687 respectively) and mitigate problems arising due to
     # overfitting."
-    alltokens = []
+
+    words = []
     for t in df['PTEXT']:
-        alltokens.extend(t)
+        words.extend(t)
+        
+    counts = pd.Series(words).value_counts()
+    allowed = set(counts[counts>=10].index)
 
-    tokencounts = pd.Series(alltokens).value_counts()
+    # # UDF
+    # def filter(tlist:list)->list:
+    #     return [t for t in tlist if t not in rare]
 
-    # tokens less than 10
-    rare = tokencounts[tokencounts<10].index.tolist()
-
-    # UDF
-    def filter(tlist:list)->list:
-        return [t for t in tlist if t not in rare]
-
-    df['FTEXT'] = df['PTEXT'].apply(filter)
+    df['FTEXT'] = df['PTEXT'].apply(lambda tokens: 
+        [t for t in tokens if t in allowed])
 
     return df
 
-# # step 5 --> target labels
+# step 5 --> target labels
+# original link does not work, using web archive
+# https://web.archive.org/web/20160308161055/http://tdrdata.com/ipd/ipd_SearchForICD9CodesAndDescriptions.aspx
 # def farsight_aggregation()->?:
 #     # each note is assigned all diagnostic codes from future notes 
 #     # attaching the full label set to each note for multi-label prediction.
