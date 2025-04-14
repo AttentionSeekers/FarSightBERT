@@ -248,43 +248,56 @@ def make_target(icd:str)->Optional[int]:
     # V Codes 	Supplemental V-Codes
     # Ref Codes 	Reference Codes 
 
+    # and is usually assigned to neonates (age < 15), who are excluded
+    # from this study as per the defined patient cohort (see Section 3.1).
+    # Hence, our dataset does not contain any records in the ICD-9
+    # code range of 760−779.
+    # REMOVING 760-779
+
+    # Furthermore, our study classifies all the
+    # Reference (Ref) and supplemental V-codes into the same code
+    # group, to lower the computational complexity of training.
+    # V and E are SAME code group!
+
     diagnosis_categories = {
-    0: (1, 139, "Infectious and Parasitic Diseases"),
-    1: (140, 239, "Neoplasms"),
-    2: (240, 279, "Endocrine, Nutritional, Metabolic, Immunity"),
-    3: (280, 289, "Blood and Blood-Forming Organs"),
-    4: (290, 319, "Mental Disorders"),
-    5: (320, 389, "Nervous System and Sense Organs"),
-    6: (390, 459, "Circulatory System"),
-    7: (460, 519, "Respiratory System"),
-    8: (520, 579, "Digestive System"),
-    9: (580, 629, "Genitourinary System"),
-    10: (630, 677, "Pregnancy, Childbirth, and the Puerperium"),
-    11: (680, 709, "Skin and Subcutaneous Tissue"),
-    12: (710, 739, "Musculoskeletal System and Connective Tissue"),
-    13: (740, 759, "Congenital Anomalies"),
-    14: (760, 779, "Conditions Originating in the Perinatal Period"),
+    1: (1, 139, "Infectious and Parasitic Diseases"),
+    2: (140, 239, "Neoplasms"),
+    3: (240, 279, "Endocrine, Nutritional, Metabolic, Immunity"),
+    4: (280, 289, "Blood and Blood-Forming Organs"),
+    5: (290, 319, "Mental Disorders"),
+    6: (320, 389, "Nervous System and Sense Organs"),
+    7: (390, 459, "Circulatory System"),
+    8: (460, 519, "Respiratory System"),
+    9: (520, 579, "Digestive System"),
+    10: (580, 629, "Genitourinary System"),
+    11: (630, 677, "Pregnancy, Childbirth, and the Puerperium"),
+    12: (680, 709, "Skin and Subcutaneous Tissue"),
+    13: (710, 739, "Musculoskeletal System and Connective Tissue"),
+    14: (740, 759, "Congenital Anomalies"),
+    # 15: (760, 779, "Conditions Originating in the Perinatal Period"),
     15: (780, 789, "Symptoms"),
     16: (790, 796, "Nonspecific Abnormal Findings"),
     17: (797, 799, "Ill-defined and Unknown Causes of Morbidity and Mortality"),
     18: (800, 999, "Injury and Poisoning"),
-    19: ('V', 'V', "Supplemental V-Codes"),
-    20: ('E', 'E', "External Causes / Reference Codes")
+    # 19 and 20 grouped into 19
+    # 19: ('V', 'V', "Supplemental V-Codes"),
+    # 20: ('E', 'E', "External Causes / Reference Codes")
     }
 
-    
     icd = str(icd).strip()
     if icd == 'nan':
         return None
-    if icd.startswith('V'):
+    if icd.startswith('V') or icd.startswith('E'):
         return 19
-    elif icd.startswith('E'):
-        return 20
+
     code = int(icd[0:3])
     for label, (i, j, desc) in diagnosis_categories.items():
         if i<=code<=j:
             return label
     return None
+
+# step 6
+
 
 # # step 6
 # def feat_extration()->?:
