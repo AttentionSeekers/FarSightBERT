@@ -10,6 +10,7 @@ import os, sys
 import argparse
 import data as step
 import pandas as pd
+import nltk
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name')
@@ -63,19 +64,35 @@ if args.name == 'preprocess':
         print('Data not found, first prepare data using `make_data`!')
         sys.exit(1)
 
-    print('\nStep 4.1: Preprocessing and Cleaning Text.')
-    notes['PTEXT'] = notes['TEXT'].apply(step.preprocess_and_clean_text)
-    print('\nStep 4.2: Remove rare tokens (<10).')
-    notes = step.remove_rare(notes)
+    print('\nStep 4.0: Downloading necessary resources.')
+    # required nltk resources
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('wordnet')
 
-    print(f'\nSaving to {os.path.join(mimic3_path, "cleaned_notes.csv")}')
-    notes.to_csv(os.path.join(mimic3_path, 'cleaned_notes.csv'))
+    
+    print('\nStep 4.1: Preprocessing and Cleaning Text.')
+    if os.path.exists(os.path.join(mimic3_path, 'preprocess_clean_notes.pkl')):
+        print('Already exists, skipping this step.')
+        notes = pd.read_pickle(os.path.join(mimic3_path, 'preprocess_clean_notes.pkl'))
+    else:
+        notes['PTEXT'] = notes['TEXT'].apply(step.preprocess_and_clean_text)
+        print(f'\nSaving to {os.path.join(mimic3_path, "preprocess_clean_notes.pkl")}')
+        notes.to_pickle(os.path.join(mimic3_path, 'preprocess_clean_notes.pkl'))
+
+    print('\nStep 4.2: Remove rare tokens (<10).')
+    if os.path.exists(os.path.join(mimic3_path, 'preprocess_clean_remove_rare.pkl')):
+        print('Already exists, skipping this step.')
+    else:
+        notes = step.remove_rare(notes)
+        print(f'\nSaving to {os.path.join(mimic3_path, "preprocess_clean_remove_rare.pkl")}')
+        notes.to_pickle(os.path.join(mimic3_path, 'preprocess_clean_remove_rare.pkl'))
 
 if args.name == 'add_targets':
     mimic3_path = 'data/'
 
-    if os.path.exists(os.path.join(mimic3_path, 'cleaned_notes.csv')):
-        notes = pd.read_csv(f'{os.path.join(mimic3_path, "cleaned_notes.csv")}')
+    if os.path.exists(os.path.join(mimic3_path, 'preprocess_clean_remove_rare_notes.csv')):
+        notes = pd.read_csv(f'{os.path.join(mimic3_path, "preprocess_clean_remove_rare_notes.csv")}')
     else:
         print('Data not found, first clean data using `preprocess`!')
         sys.exit(1)
