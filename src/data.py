@@ -6,12 +6,14 @@ Created on 2025-03-31 10:10:50 Monday
 @author: Nikhil Kapila
 """
 
-import pandas as pd
-import re
-import nltk
 import os
-
 from typing import Optional
+import re
+import pandas as pd
+import numpy as np
+
+# from transformers.models.bert import BertTokenizerFast, BertModel
+import nltk
 
 # step 1
 def load_mimic3(files:list, path:str)->dict:
@@ -219,6 +221,7 @@ def remove_rare(df:pd.DataFrame)->pd.DataFrame:
     return df
 
 # step 5 --> target labels
+# UDF for .apply
 def make_target(icd:str)->Optional[int]:
     # The ICD-9 codes of a given admission from MIMIC-III are mapped into 19
     # distinct diagnostic groups9. The ICD-9 code range of 760−779
@@ -291,17 +294,136 @@ def make_target(icd:str)->Optional[int]:
         return 19
 
     code = int(icd[0:3])
+    
     for label, (i, j, desc) in diagnosis_categories.items():
         if i<=code<=j:
             return label
     return None
 
 # step 6
+def create_multiclass_target(df: pd.DataFrame)->pd.DataFrame:
+    # "Furthermore, to maintain consistency in 
+    # benchmarking with respect to the related works, 
+    # and to avoid possible information loss during 
+    # analysis, only the first admission to the ICU 
+    # for each MIMIC-III subject was considered, 
+    # and all the later admissions were discarded."
+
+    result_df = []
+    # Process each patient (SUBJECT_ID) group
+    for subject_id, group in df.groupby('SUBJECT_ID'):
+        # sorting
+        hadm_ids = sorted(group['HADM_ID'].unique())
+        
+        # first admission ID
+        hadmid = hadm_ids[0]
+        
+        # diagnostic groups for the first admission only
+        diags = group[group['HADM_ID'] == hadmid]['TARGET'].unique().tolist()
+        
+        result_df.append({
+            'SUBJECT_ID': subject_id,
+            # 'FIRST_HADM_ID': hadmid,
+            'TARGETS': diags
+        })
+        
+    return pd.DataFrame(result_df)
 
 
-# # step 6
-# def feat_extration()->?:
-#     # doc2vec --> Gensim (NLP hw4 :))
-#     # nmf for topic modeling
+# step 7
+def get_bert_embeddings(sentences:list)->np.ndarray:
+    from sentence_transformers import SentenceTransformer, models
+    import torch
 
-#     return #TODO
+    word_embedding_model = models.Transformer(
+        'emilyalsentzer/Bio_ClinicalBERT',
+        max_seq_length=512,
+        model_args={"torch_dtype": torch.float32} 
+    )
+
+    pooling_model = models.Pooling(
+        word_embedding_model.get_word_embedding_dimension(),
+        pooling_mode_cls_token=True,
+        pooling_mode_mean_tokens=False,
+        pooling_mode_max_tokens=False
+    )
+
+    # hardcoding mps
+    model = SentenceTransformer(modules=[word_embedding_model, pooling_model], device='mps')
+    embeddings = model.encode(sentences, batch_size=16, show_progress_bar=True)
+
+    return embeddings
+
+# switching from HUGGINGFACE TRANSFORMERS to SENTENCE-TRANSFORMERS
+# https://sbert.net/index.html
+# # step 7
+# def get_bert_embeddings(tokenizer:BertTokenizerFast,
+#                         model:BertModel,
+#                         tokens: list, max_length:int=512, 
+#                         device=None)->np.ndarray:
+#     # WE USE BERT instead of training our own doc2vec
+#     # https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT
+#     # https://arxiv.org/pdf/1904.03323
+    
+#     # OMITTED:
+#     #  doc2vec --> Gensim (NLP hw4 :))
+#     #  nmf for topic modeling
+        
+#     if device is None:
+#         device = 'mps' if torch.backends.mps.is_available() else 'cpu'
+#     model = model.to(device)
+#     model.eval()
+    
+#     text = ' '.join(tokens)
+#     inp = tokenizer(text, return_tensors="pt",
+#                         max_length=512,
+#                         # padding=True,
+#                         truncation=True)
+
+#     inp = {k: v.to(device) for k,v in inp.items()}
+
+#     with torch.no_grad():
+#         o = model(**inp)
+
+#     embedding = o.last_hidden_state[:, 0, :].cpu().numpy()[0]
+
+#     return embedding
+
+
+# # step 7 : batching it for faster processing
+# def get_bert_embeddings_batched(tokenizer:BertTokenizerFast,
+#                                 model:BertModel,
+#                                 token_list: list, 
+#                                 batch_size:int=32,
+#                                 max_length:int=512, 
+#                                 device=None)->list:
+#     embeddings = []
+
+#     if device is None:
+#         device = 'mps' if torch.backends.mps.is_available() else 'cpu'
+
+    # model = model.to(device)
+    # model.eval()
+    
+    # print(f'\nUsing device {device}')
+    # for i in range(0, len(token_list), batch_size):
+    #     batch = token_list[i:i+batch_size]
+    #     texts = [' '.join(t) for t in batch]
+
+    #     inp = tokenizer(texts, return_tensors='pt',
+    #                     truncation=True, max_length=512,
+    #                     padding=True)
+
+    #     inp = {k: v.to(device) for k,v in inp.items()}
+
+    #     with torch.no_grad():
+    #         o = model(**inp)
+
+    #     e = o.last_hidden_state[:, 0, :].cpu().numpy()[0]
+    #     embeddings.extend(e)
+
+#     return embeddings
+
+# step 8 merge dataset
+def get_final_data(diags:pd.DataFrame, text:pd.DataFrame)->pd.DataFrame:
+    return pd.DataFrame()
