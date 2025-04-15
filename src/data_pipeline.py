@@ -11,6 +11,7 @@ import argparse
 import pickle
 
 import data as step
+import numpy as np
 import pandas as pd
 import nltk
 from transformers import AutoTokenizer, AutoModel
@@ -138,7 +139,34 @@ if args.name == 'prep_data':
     textdf['EMBEDDING'] = list(embeddings)
     textdf.to_pickle('data/notes_with_embeddings.pkl')
     
-    # step 8 merge
+# step 8 get final data
+if args.name == 'get_final_data':
+    mimic3_path = 'data/'
+    
+    # step 8.11
+    print('\nStep 8.1: Loading data to merge.')
+    if os.path.exists(os.path.join(mimic3_path, 'multiclass_diag_target.pkl')):
+        diag = pd.read_pickle(f'{os.path.join(mimic3_path, "multiclass_diag_target.pkl")}')
+        notes = pd.read_pickle(f'{os.path.join(mimic3_path, "notes_with_embeddings.pkl")}')
+        print('Data loaded.')
+    else:
+        print('Data not found, first prep data using `prep_data`!')
+        sys.exit(1)
 
+    data = step.get_dataset(diag, notes)
+
+    print('\nSaving full dataset to data/dataset_df.pkl.')
+    data.to_pickle('data/dataset_df.pkl')
+
+    X = np.stack(data['EMBEDDING'])
+    y = np.stack(data['TARGETS'].apply(step.y_mhe))
+
+    print('\nSaving X and y for dataset.')
+    with open("data/X.pkl", "wb") as f:
+        pickle.dump(X, f)
+    
+    with open("data/y.pkl", "wb") as f:
+        pickle.dump(y, f)
+    
     
     
