@@ -50,9 +50,9 @@ class TrainingPipeline:
 
         def train_acc_scoring(net, batch, y):
             if hasattr(batch, 'indices'):  # when using ValSplit(.1)
-                train_actual = np.array([batch.dataset.X[batch.indices]])
+                train_actual = np.array(batch.dataset.y[batch.indices])
             else:  # when using the full dataset without valsplit
-                train_actual = np.array(batch.dataset.X)
+                train_actual = np.array(batch.y)
                 # train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
             train_preds = net.predict(batch)
             
@@ -66,7 +66,7 @@ class TrainingPipeline:
                 batch_size=batch_size,
                 train_split=ValidSplit(5),
                 lr=learning_rate,
-                callbacks=[training_acc_callback, ProgressBar()],
+                callbacks=[ProgressBar(), training_acc_callback],
                 optimizer=torch.optim.Adam,
                 criterion=nn.BCEWithLogitsLoss(),
                 device=self.device
@@ -75,8 +75,7 @@ class TrainingPipeline:
         net.fit(X=self.X_train, y=self.y_train) 
 
         # Save trained model to use it later in mixture of model architecture
-        with open(f'trained_models/{type(model).__name__}.pkl', 'wb') as f:
-            pickle.dump(net, f)
+        net.save_params(f_params=f'trained_models/{type(model).__name__}.pkl')
 
     def eval_model(self):
         pass
