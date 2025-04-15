@@ -8,9 +8,12 @@ Created on 2025-04-01 12:25:06 Tuesday
 
 import os, sys
 import argparse
+import pickle
+
 import data as step
 import pandas as pd
 import nltk
+from transformers import AutoTokenizer, AutoModel
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name')
@@ -23,6 +26,7 @@ if args.name == None:
     print('\nPlease select an argument.\
         \nAvailable arguments:\n1. `make_data` : Raw data preparation\
         \n2. `preprocess`: Preprocess and clean text\
+        \n3. `prep_data`: Complete data preparation.\
             ')
 
 if args.name == 'make_data': #step1-3
@@ -88,7 +92,7 @@ if args.name == 'preprocess':
         print(f'\nSaving to {os.path.join(mimic3_path, "preprocess_clean_remove_rare.pkl")}')
         notes.to_pickle(os.path.join(mimic3_path, 'preprocess_clean_remove_rare.pkl'))
 
-if args.name == 'add_targets':
+if args.name == 'prep_data':
     mimic3_path = 'data/'
 
     if os.path.exists(os.path.join(mimic3_path, 'preprocess_clean_remove_rare_notes.csv')):
@@ -97,4 +101,44 @@ if args.name == 'add_targets':
         print('Data not found, first clean data using `preprocess`!')
         sys.exit(1)
 
-    print('Under construction')
+    files = ['PATIENTS.csv', 'ADMISSIONS.csv', 'DIAGNOSES_ICD.csv']
+    mimic3_path = 'data/'
+
+    print('\nStep 5.1: Loading MIMIC (diag) data.')
+    # step 1
+    dfdict = step.load_mimic3(files, mimic3_path)
+    diag = dfdict['DIAGNOSES_ICD.csv']
+
+    # step 5: adding targets
+    print('\nStep 5: Adding targets to diag.')
+    diag['TARGET'] = diag['ICD9_CODE'].apply(step.make_target).fillna(-1).astype(int)
+    print('\nSaving pickle to data/diag_target.pkl.')
+    diag.to_pickle('data/diag_target.pkl')
+
+    # step 6: grouping targets
+    print('\nStep 6: Grouping targets.')
+    df = step.create_multiclass_target(diag)
+    print('\nSaving pickle to data/multiclass_diag_target.pkl.')
+    df.to_pickle('data/multiclass_diag_target.pkl')
+
+    # step 7 - completed in notebook (get_embeddings.ipynb) and 
+    # then ported into pipeline for reproduction
+    print('\nStep 7: Converting to embeddings.')
+    textdf = pd.read_pickle('data/preprocess_clean_remove_rare.pkl')
+
+    textdf['SENT'] = textdf['FTEXT'].apply(lambda tokens: ' '.join(tokens))
+    sentences = textdf['SENT'].tolist()
+    embeddings = step.get_bert_embeddings(sentences)
+    
+    print('\nSaving np.ndarray of embeddings.')
+    with open("data/embeddings.pkl", "wb") as f:
+        pickle.dump(embeddings, f)
+
+    print('\nSaving dataframe with embeddings.')
+    textdf['EMBEDDING'] = list(embeddings)
+    textdf.to_pickle('data/notes_with_embeddings.pkl')
+    
+    # step 8 merge
+
+    
+    
