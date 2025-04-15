@@ -7,7 +7,7 @@ Created on 2025-04-09 12:36:50 Wednesday
 """
 
 import torch
-import torch.functional as F
+import torch.nn.functional as F
 from torch import nn
 
 # structure:
@@ -18,9 +18,9 @@ from torch import nn
 #     sigmoid
 
 
-class convnet(nn.Module):
+class ConvNet(nn.Module):
     def __init__(self, input_size):
-        super(convnet, self).__init__()
+        super(ConvNet, self).__init__()
         self.fc1 = nn.Linear(in_features=input_size, out_features=289)
         self.conv1 = nn.Conv2d(1, 19, kernel_size=3)
         self.fc2 = nn.Linear(in_features=19 * 225, out_features=19)

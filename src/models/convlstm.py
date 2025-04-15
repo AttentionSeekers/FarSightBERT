@@ -7,7 +7,7 @@ Created on 2025-04-09 12:35:44 Wednesday
 """
 
 import torch
-import torch.functional as F
+import torch.nn.functional as F
 from torch import nn
 
 # structure:
