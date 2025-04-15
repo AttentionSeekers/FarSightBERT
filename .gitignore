@@ -164,3 +164,4 @@ cython_debug/
 src/data/NOTEEVENTS.csv.gz
 src/data/raw_notes.csv
 src/data/NOTEEVENTS.csv
+/src/data
