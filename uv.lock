@@ -1337,6 +1337,7 @@ dependencies = [
     { name = "pip" },
     { name = "polars" },
     { name = "scikit-learn" },
+    { name = "sentence-transformers" },
     { name = "torch" },
     { name = "transformers" },
 ]
@@ -1353,6 +1354,7 @@ requires-dist = [
     { name = "pip", specifier = ">=25.0.1" },
     { name = "polars", specifier = ">=1.27.0" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
+    { name = "sentence-transformers", specifier = ">=4.0.2" },
     { name = "torch", specifier = ">=2.6.0" },
     { name = "transformers", specifier = ">=4.51.3" },
 ]
@@ -2293,6 +2295,25 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fd/3a/aec9b02217bb79b87bbc1a21bc6abc51e3d5dcf65c30487ac96c0908c722/Send2Trash-1.8.3.tar.gz", hash = "sha256:b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf", size = 17394 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/b0/4562db6223154aa4e22f939003cb92514c79f3d4dccca3444253fd17f902/Send2Trash-1.8.3-py3-none-any.whl", hash = "sha256:0c31227e0bd08961c7665474a3d1ef7193929fedda4233843689baa056be46c9", size = 18072 },
+]
+
+[[package]]
+name = "sentence-transformers"
+version = "4.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "pillow" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "transformers" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3c/74/606783c6b2e80a609af25d2c487bbe32eb8f0970b0f7519fbb1a099f3ab8/sentence_transformers-4.0.2.tar.gz", hash = "sha256:d33d0c5a69ae0d682115c90e74fc1dc24c4786aeea78e26f5889b037e5921880", size = 267724 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/58/770e1e762893abbfe3cd048f1ed1ea6e00122a195651ea98fb27f55ad17a/sentence_transformers-4.0.2-py3-none-any.whl", hash = "sha256:25f5086d0746c22177f9fb7d431f3eebe6375f3afe1dc7c341c4ca9061e98771", size = 340618 },
 ]
 
 [[package]]
