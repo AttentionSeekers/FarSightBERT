@@ -425,5 +425,16 @@ def get_bert_embeddings(sentences:list)->np.ndarray:
 #     return embeddings
 
 # step 8 merge dataset
-def get_final_data(diags:pd.DataFrame, text:pd.DataFrame)->pd.DataFrame:
-    return pd.DataFrame()
+def get_dataset(diag:pd.DataFrame, notes:pd.DataFrame)->pd.DataFrame:
+    df = pd.DataFrame({
+    'EMBEDDING': notes['EMBEDDING'],
+    'SUBJECT_ID': notes['SUBJECT_ID']
+    })
+
+    data = pd.merge(df, diag, on='SUBJECT_ID', how='inner')
+    
+    return data
+
+# multi hot encode
+def y_mhe(targs:list)->np.ndarray:
+    return np.eye(19, dtype='uint8')[np.array(targs) - 1].sum(axis=0)
