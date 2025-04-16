@@ -42,34 +42,54 @@ class TrainingPipeline:
         self.y_train = torch.tensor(y_train, dtype=torch.float32).to(self.device)
         self.X_test = torch.tensor(X_test, dtype=torch.float32).to(self.device)
         self.y_test = torch.tensor(y_test, dtype=torch.float32).to(self.device)
-
-        print('Train Test split generated successfully !')
+        print('Train/Test split completed.')
     
     def train_model(self, model, args):
-        max_epochs, learning_rate, batch_size = args['max_epochs'], args['learning_rate'], args['batch_size']
+        callbacks = []
+        max_epochs, learning_rate, batch_size, device = \
+            args['max_epochs'], args['learning_rate'], args['batch_size'], args['device']
 
-        def train_acc_scoring(net, batch, y):
-            if hasattr(batch, 'indices'):  # when using ValSplit(.1)
-                train_actual = np.array(batch.dataset.y[batch.indices])
-            else:  # when using the full dataset without valsplit
-                train_actual = np.array(batch.y)
-                # train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
-            train_preds = net.predict(batch)
-            
-            return accuracy_score(train_actual, train_preds)
+        def calculate_acc(net, ds, y):
+            y_true = np.stack([y.numpy() for _,y in ds]).astype(int)
+            y_pred = net.predict(ds)
+
+            per_class_acc = []
+
+            for i in range(y_true.shape[1]): #19
+                per_class_acc.append(
+                    accuracy_score(y_true[:, i], y_pred[:, i])
+                )
+
+            return np.mean(per_class_acc)
+
         
-        training_acc_callback = EpochScoring(train_acc_scoring, name='train_acc',  on_train=True, lower_is_better=False)
+        training_acc_callback = EpochScoring(calculate_acc,
+                                             name='train_acc',  
+                                             on_train=True, 
+                                             lower_is_better=False)
+
+
+        val_acc_callback = EpochScoring(calculate_acc,
+                                             name='valid_acc',
+                                             on_train=False,
+                                             lower_is_better=False)
+
+        callbacks.append(training_acc_callback)
+        callbacks.append(val_acc_callback)
+        callbacks.append(ProgressBar())
+
+        print(f'Using device: {device}')
         
         net = NeuralNetClassifier(
                 model,
                 max_epochs=max_epochs,
                 batch_size=batch_size,
-                train_split=ValidSplit(5),
                 lr=learning_rate,
-                callbacks=[ProgressBar(), training_acc_callback],
+                callbacks=callbacks,
+                train_split=ValidSplit(5),
                 optimizer=torch.optim.Adam,
-                criterion=nn.BCEWithLogitsLoss(),
-                device=self.device
+                criterion=nn.BCEWithLogitsLoss,
+                device=device
             )
 
         net.fit(X=self.X_train, y=self.y_train) 
