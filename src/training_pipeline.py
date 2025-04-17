@@ -5,18 +5,21 @@ Created on 2025-04-15 00:14:19 IST (UTC+05:30) Tuesday
 
 @author: Tejas Rathi
 """
-import pickle
 import torch
-import numpy as np
 from torch import nn
+import pickle
+import numpy as np
+# optuna 
+import optuna
+from optuna.integration import SkorchPruningCallback
+# skorch
 from skorch import NeuralNetClassifier
-from models.convlstm import ConvLSTM
-from models.convnet import ConvNet
-from skorch.dataset import ValidSplit
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, roc_auc_score, average_precision_score, accuracy_score
 from skorch.callbacks import ProgressBar
+from skorch.dataset import ValidSplit
 from skorch.callbacks import EpochScoring
+# sklearn and metrics
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 class TrainingPipeline:    
     def __init__(self):
@@ -24,7 +27,13 @@ class TrainingPipeline:
         self.X_test = None
         self.y_train = None 
         self.y_test = None
-        self.device ='cuda' if torch.cuda.is_available() else 'cpu' # GPU support
+        self.best_params = None
+        self.data_loaded = False
+        self.batch_size = 128
+        self.max_epochs = 10
+        self.device = 'mps' if torch.backends.mps.is_available() else ('cuda' if torch.cuda.is_available() else 'cpu')
+        self.study = None
+        self.test_run_optuna = None
 
     def load_data(self):
         # Load preprocessed data
@@ -43,33 +52,20 @@ class TrainingPipeline:
         self.X_test = torch.tensor(X_test, dtype=torch.float32).to(self.device)
         self.y_test = torch.tensor(y_test, dtype=torch.float32).to(self.device)
         print('Train/Test split completed.')
+        self.data_loaded = True
     
     def train_model(self, model, args):
         callbacks = []
-        max_epochs, learning_rate, batch_size, device = \
-            args['max_epochs'], args['learning_rate'], args['batch_size'], args['device']
-
-        def calculate_acc(net, ds, y):
-            y_true = np.stack([y.numpy() for _,y in ds]).astype(int)
-            y_pred = net.predict(ds)
-
-            per_class_acc = []
-
-            for i in range(y_true.shape[1]): #19
-                per_class_acc.append(
-                    accuracy_score(y_true[:, i], y_pred[:, i])
-                )
-
-            return np.mean(per_class_acc)
-
-        
-        training_acc_callback = EpochScoring(calculate_acc,
+        max_epochs, learning_rate, batch_size = \
+            args['max_epochs'], args['learning_rate'], args['batch_size']
+                    
+        training_acc_callback = EpochScoring(self.calculate_acc,
                                              name='train_acc',  
                                              on_train=True, 
                                              lower_is_better=False)
 
 
-        val_acc_callback = EpochScoring(calculate_acc,
+        val_acc_callback = EpochScoring(self.calculate_acc,
                                              name='valid_acc',
                                              on_train=False,
                                              lower_is_better=False)
@@ -78,7 +74,7 @@ class TrainingPipeline:
         callbacks.append(val_acc_callback)
         callbacks.append(ProgressBar())
 
-        print(f'Using device: {device}')
+        print(f'Using device: {self.device}')
         
         net = NeuralNetClassifier(
                 model,
@@ -89,7 +85,7 @@ class TrainingPipeline:
                 train_split=ValidSplit(5),
                 optimizer=torch.optim.Adam,
                 criterion=nn.BCEWithLogitsLoss,
-                device=device
+                device=self.device
             )
 
         net.fit(X=self.X_train, y=self.y_train) 
