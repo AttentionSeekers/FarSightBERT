@@ -97,6 +97,20 @@ class TrainingPipeline:
         # Save trained model to use it later in mixture of model architecture
         net.save_params(f_params=f'trained_models/{type(model).__name__}.pkl')
 
+    def calculate_acc(self, net, ds, y):
+        y_true = np.stack([y.cpu().numpy() for _,y in ds]).astype(int)
+        y_pred = net.predict(ds)
+
+        per_class_acc = []
+
+        for i in range(y_true.shape[1]): #19
+            per_class_acc.append(
+                accuracy_score(y_true[:, i], y_pred[:, i])
+            )
+
+        return np.mean(per_class_acc)
+
+    # TODO(@trathi9): Why was this added?
     def eval_model(self):
         pass
 
