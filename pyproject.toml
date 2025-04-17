@@ -19,4 +19,5 @@ dependencies = [
     "torch>=2.6.0",
     "transformers>=4.51.3",
     "skorch==1.1.0",
+    "optuna>=4.3.0",
 ]
