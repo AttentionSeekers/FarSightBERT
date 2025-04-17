@@ -99,3 +99,103 @@ class TrainingPipeline:
 
     def eval_model(self):
         pass
+
+    def create_optuna_objective(self, model):
+        def objective(trial):
+
+            print(f'-- Trial number {trial.number} --')
+            if self.test_run_optuna is True:
+                # -- for testing purposes --
+                learning_rate = trial.suggest_categorical('learning_rate', [1e-5])#, 1e-1) 
+            else:
+                learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-1)
+            # -- fixing at 128 --
+            # batch_size = trial.suggest_categorical('batch_size', [32, 64, 128, 256])
+            # -- fixing at 10 --
+            # max_epochs = trial.suggest_int('max_epochs', 10, 50)
+            
+            # Create callbacks including pruning
+            callbacks = [
+                EpochScoring(self.calculate_acc, name='train_acc', on_train=True, lower_is_better=False),
+                EpochScoring(self.calculate_acc, name='valid_acc', on_train=False, lower_is_better=False),
+                ProgressBar(),
+                # SkorchPruningCallback(trial, 'valid_acc')
+            ]
+
+            net = NeuralNetClassifier(
+                model,
+                max_epochs=self.max_epochs,
+                batch_size=self.batch_size,
+                lr=learning_rate,
+                callbacks=callbacks,
+                train_split=ValidSplit(5),
+                optimizer=torch.optim.Adam,
+                criterion=nn.BCEWithLogitsLoss,
+                device=self.device
+            )
+            net.fit(X=self.X_train, y=self.y_train)
+
+            train_acc = net.history[-1, 'train_acc']
+            valid_acc = net.history[-1, 'valid_acc']
+            # we define a multi objective --> 
+            # MAX VALID_ACC BUT LOW GAP IN ACCURACIES == GENERALIZATION
+            generalization_gap = abs(train_acc-valid_acc)
+
+            return valid_acc, generalization_gap
+            
+        return objective
+
+    def optimize_hyperparameters(self, model_class, n_trials=100):
+        if self.data_loaded is False:
+            self.load_data()
+
+        sampler = optuna.samplers.TPESampler(
+            n_startup_trials=5, #
+            n_ei_candidates=12,
+            seed=42
+            )
+
+        self.study = optuna.create_study(
+                    directions=['maximize', 'minimize'], # max valid, low generalization gap
+                    sampler=sampler
+                )
+        
+        objective = self.create_optuna_objective(model_class)
+        print(f'Using device: {self.device}.')
+        self.study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+
+        # best trial
+        print('Best trial:')
+        best = self.select_best_trial(self.study)
+        return self.study, best
+
+    def select_best_trial(self, study):
+        if not study.trials:
+            raise ValueError("No trials have completed for this study.")
+
+        trials = [
+            trial for trial in study.trials if trial.state == optuna.trial.TrialState.COMPLETE
+            ]
+
+        sorted_trials = sorted(trials, key=lambda x: (x.values[0],-x.values[1]), reverse=True)
+        bestfrom5 = sorted_trials[0]
+
+        print("\nBest trial")
+        print(f' - Validation accuracy: {bestfrom5.values[0]}')
+        print(f' - Generalization gap: {bestfrom5.values[1]}')
+        print(f'Parameters:')
+        for k, v in bestfrom5.params.items():
+            print(f'{k}: {v}')
+        return bestfrom5.params
+        
+    def train_model_using_optuna_hp(self, model, best_params=None):
+        if best_params is None:
+            best_params = {
+                'max_epochs': 10,
+                'learning_rate': 0.001,
+                'batch_size': 128,
+                'device': self.device
+            }
+
+        # Call the existing train_model method with optimized parameters
+        self.train_model(model, best_params)
