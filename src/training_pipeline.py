@@ -118,7 +118,8 @@ class TrainingPipeline:
                 # -- for testing purposes --
                 learning_rate = trial.suggest_categorical('learning_rate', [1e-5])#, 1e-1) 
             else:
-                learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-1)
+                learning_rate = trial.suggest_categorical('learning_rate', [1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+            
             # -- fixing at 128 --
             # batch_size = trial.suggest_categorical('batch_size', [32, 64, 128, 256])
             # -- fixing at 10 --
@@ -175,7 +176,6 @@ class TrainingPipeline:
         self.study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
 
         # best trial
-        print('Best trial:')
         best = self.select_best_trial(self.study)
         return self.study, best
 
