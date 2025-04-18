@@ -22,15 +22,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 class TrainingPipeline:    
-    def __init__(self):
+    def __init__(self, max_epochs = 10, batch_size = 128):
         self.X_train = None
         self.X_test = None
         self.y_train = None 
         self.y_test = None
         self.best_params = None
         self.data_loaded = False
-        self.batch_size = 128
-        self.max_epochs = 10
+        self.batch_size = batch_size
+        self.max_epochs = max_epochs
         self.device = 'mps' if torch.backends.mps.is_available() else ('cuda' if torch.cuda.is_available() else 'cpu')
         self.study = None
         self.test_run_optuna = None
