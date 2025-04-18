@@ -3,9 +3,10 @@
 // #import "@preview/charged-ieee:0.1.3": ieee
 
 #show: ieee.with(
-  title: [Long Term Disease Prediction Using BERT Embeddings],
+  title: [FarSightBERT:  Enhanced Embeddings for Long-Term Disease Prediction],
   abstract: [
-    The process of scientific writing is often tangled up with the intricacies of typesetting, leading to frustration and wasted time for researchers. In this paper, we introduce Typst, a new typesetting system designed specifically for scientific writing. Typst untangles the typesetting process, allowing researchers to compose papers faster. In a series of experiments we demonstrate that Typst offers several advantages, including faster document creation, simplified syntax, and increased ease-of-use.
+    //TODO
+    ???
   ],
   authors: (
     (
@@ -22,7 +23,8 @@
     ),
   ),
   github-repo: "https://github.gatech.edu/nkapila6/nlpvise",
-  index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax"), //TODO
+  index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax", "Clinical decision support systems", "Disease prediction", "Healthcare analytics", "ICD-9 code group prediction", "Precision medicine"),
+  // index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax"), //TODO
   bibliography: bibliography("bibs/refs.bib"),
   figure-supplement: [Fig.],
 )
