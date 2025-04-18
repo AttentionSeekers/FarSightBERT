@@ -19,7 +19,7 @@ from skorch.dataset import ValidSplit
 from skorch.callbacks import EpochScoring
 # sklearn and metrics
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score, roc_auc_score, average_precision_score, accuracy_score, matthews_corrcoef
 
 class TrainingPipeline:    
     def __init__(self, max_epochs = 10, batch_size = 128):
@@ -100,9 +100,23 @@ class TrainingPipeline:
 
         return np.mean(per_class_acc)
 
-    # TODO(@trathi9): Why was this added?
-    def eval_model(self, model):
-        pass
+    def eval_model(self, model, threshold=0.6):
+        logits = model.predict(self.X_test)
+        y_probs = torch.sigmoid(torch.tensor(logits)).numpy()
+        y_pred = (y_probs > threshold).astype(int)
+
+        _acc = [ accuracy_score(self.y_test[:, i], y_pred[:, i]) for i in self.y_test.shape[1]]
+        _mcc = [ matthews_corrcoef(self.y_test[:, i], y_pred[:, i]) for i in self.y_test.shape[1]]
+
+        results = {
+            'ACC': np.mean(_acc),
+            'MCC': np.mean(_mcc),
+            'F1': f1_score(self.y_test, y_pred, average='weighted'),
+            'AUPRC': average_precision_score(self.y_test, y_probs),
+            'AUROC': roc_auc_score(self.y_test, y_probs)
+        }
+
+        return results
 
     def create_optuna_objective(self, model):
         def objective(trial):
