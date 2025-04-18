@@ -1,20 +1,101 @@
-@article{netwok2020,
-  title={At-scale impact of the {Net Wok}: A culinarically holistic investigation of distributed dumplings},
-  author={Astley, Rick and Morris, Linda},
-  journal={Armenian Journal of Proceedings},
-  volume={61},
-  pages={192--219},
-  year=2020,
-  publisher={Automatic Publishing Inc.}
+@article{farsight-orig,
+  title={{FarSight}: Long-Term Disease Prediction Using Unstructured Clinical Nursing Notes},
+  author={Gangavarapu, Tushaar and Krishnan, Gokul S and Kamath, Sowmya S and Jeganathan, Jayakumar},
+  journal={IEEE Transactions on Emerging Topics in Computing},
+  volume={10},
+  number={10},
+  pages={1-16},
+  year={2020},
+  publisher={IEEE},
+  doi={10.1109/TETC.2020.2975251},
 }
 
-@article{netwok2022,
-  title={{Net Wok}++: Taking distributed dumplings to the cloud},
-  author={Morris, Linda and Astley, Rick},
-  journal={Armenian Journal of Proceedings},
-  volume={65},
-  pages={101--118},
-  year=2022,
-  publisher={Automatic Publishing Inc.}
+@inproceedings{alsentzer-etal-2019-publicly,
+  title = {Publicly Available Clinical {BERT} Embeddings},
+  author = {Alsentzer, Emily and Murphy, John and Boag, William and Weng, Wei-Hung and Jin, Di and Naumann, Tristan and McDermott, Matthew},
+  booktitle = {Proceedings of the 2nd Clinical Natural Language Processing Workshop},
+  pages = {72--78},
+  year = {2019},
+  address = {Minneapolis, Minnesota, USA},
+  publisher = {Association for Computational Linguistics},
+  url = {https://www.aclweb.org/anthology/W19-1909},
+  doi = {10.18653/v1/W19-1909}
 }
 
+@software{bio_clinicalbert,
+  author       = {Emily Alsentzer},
+  title        = {Bio\_ClinicalBERT},
+  year         = {2019},
+  publisher    = {Hugging Face},
+  url          = {https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT},
+  note         = {Pretrained BERT model for clinical text, initialized from BioBERT and trained on MIMIC-III clinical notes.},
+  version      = {1.0},
+  license      = {MIT}
+}
+
+@inproceedings{devlin2019bert,
+  title     = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies},
+  pages     = {4171--4186},
+  year      = {2019},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/N19-1423},
+  url       = {https://aclanthology.org/N19-1423}
+}
+
+@article{johnson2016mimic,
+  title={MIMIC-III, a freely accessible critical care database},
+  author={Johnson, Alistair EW and Pollard, Tom J and Shen, Lu and Lehman, Li-wei H and Feng, Mengling and Ghassemi, Mohammad and Moody, Benjamin and Szolovits, Peter and Celi, Leo Anthony and Mark, Roger G},
+  journal={Scientific Data},
+  volume={3},
+  pages={160035},
+  year={2016},
+  publisher={Nature Publishing Group},
+  doi={10.1038/sdata.2016.35},
+  url={https://www.nature.com/articles/sdata201635}
+}
+
+@ARTICLE{moe-orig,
+  author={Jacobs, Robert A. and Jordan, Michael I. and Nowlan, Steven J. and Hinton, Geoffrey E.},
+  journal={Neural Computation}, 
+  title={Adaptive Mixtures of Local Experts}, 
+  year={1991},
+  volume={3},
+  number={1},
+  pages={79-87},
+  keywords={},
+  doi={10.1162/neco.1991.3.1.79}}
+
+@Article{mimic3ds,
+author={Johnson, Alistair E.W.
+and Pollard, Tom J.
+and Shen, Lu
+and Lehman, Li-wei H.
+and Feng, Mengling
+and Ghassemi, Mohammad
+and Moody, Benjamin
+and Szolovits, Peter
+and Anthony Celi, Leo
+and Mark, Roger G.},
+title={MIMIC-III, a freely accessible critical care database},
+journal={Scientific Data},
+year={2016},
+month={May},
+day={24},
+volume={3},
+number={1},
+pages={160035},
+abstract={MIMIC-III (`Medical Information Mart for Intensive Care') is a large, single-center database comprising information relating to patients admitted to critical care units at a large tertiary care hospital. Data includes vital signs, medications, laboratory measurements, observations and notes charted by care providers, fluid balance, procedure codes, diagnostic codes, imaging reports, hospital length of stay, survival data, and more. The database supports applications including academic and industrial research, quality improvement initiatives, and higher education coursework.},
+issn={2052-4463},
+doi={10.1038/sdata.2016.35},
+url={https://doi.org/10.1038/sdata.2016.35}
+}
+
+@misc{tdrdata_icd9_2016,
+  author       = {{TDRDATA}},
+  title        = {Search for {ICD9} Codes and Descriptions},
+  year         = {2016},
+  url          = {https://web.archive.org/web/20160308161055/http://tdrdata.com/ipd/ipd_SearchForICD9CodesAndDescriptions.aspx},
+  note         = {Archived from the original on March 8, 2016},
+}
