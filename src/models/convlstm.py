@@ -38,7 +38,10 @@ class ConvLSTM(nn.Module):
         c0: the initial cell state
     """ 
 
-    def forward(self, x, h0, c0):
+    def forward(self, x, h0=None, c0=None):
+      h0 = torch.randn(1, 1, 300) if h0 == None else h0        
+      c0 = torch.randn(1, 1, 300) if c0 == None else c0  
+      
       x = F.relu(self.fc1(x))
       x = x.view(-1, 1, int(289**0.5), int(289**0.5))
       x = F.relu(self.conv1(x))
@@ -48,4 +51,4 @@ class ConvLSTM(nn.Module):
       out, (hn, cn) = self.lstm(x, (h0, c0))
       out = out.squeeze()
       out = self.fc3(out)
-      return out, h0, c0
+      return out
