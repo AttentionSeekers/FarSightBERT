@@ -28,6 +28,7 @@ class ConvLSTM(nn.Module):
         self.fc2 = nn.Linear(19 * 225, 289)
         self.lstm = nn.LSTM(289, 300)
         self.fc3 = nn.Linear(300, 19)
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     """
     Forward pass for ConvLSTM
@@ -39,8 +40,8 @@ class ConvLSTM(nn.Module):
     """ 
 
     def forward(self, x, h0=None, c0=None):
-      h0 = torch.randn(1, 1, 300) if h0 == None else h0        
-      c0 = torch.randn(1, 1, 300) if c0 == None else c0  
+      h0 = torch.randn(1, 1, 300).to(self.device) if h0 == None else h0        
+      c0 = torch.randn(1, 1, 300).to(self.device) if c0 == None else c0  
       
       x = F.relu(self.fc1(x))
       x = x.view(-1, 1, int(289**0.5), int(289**0.5))

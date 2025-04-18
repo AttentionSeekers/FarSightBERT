@@ -65,13 +65,7 @@ class TrainingPipeline:
                                              lower_is_better=False)
 
 
-        val_acc_callback = EpochScoring(self.calculate_acc,
-                                             name='valid_acc',
-                                             on_train=False,
-                                             lower_is_better=False)
-
         callbacks.append(training_acc_callback)
-        callbacks.append(val_acc_callback)
         callbacks.append(ProgressBar())
 
         print(f'Using device: {self.device}')
@@ -82,7 +76,7 @@ class TrainingPipeline:
                 batch_size=batch_size,
                 lr=learning_rate,
                 callbacks=callbacks,
-                train_split=ValidSplit(5),
+                train_split=None,
                 optimizer=torch.optim.Adam,
                 criterion=nn.BCEWithLogitsLoss,
                 device=self.device
@@ -107,7 +101,7 @@ class TrainingPipeline:
         return np.mean(per_class_acc)
 
     # TODO(@trathi9): Why was this added?
-    def eval_model(self):
+    def eval_model(self, model):
         pass
 
     def create_optuna_objective(self, model):

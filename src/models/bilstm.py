@@ -24,6 +24,7 @@ class BiLSTM(nn.Module):
         self.fc1  = nn.Linear(input_size, 289)
         self.lstm = nn.LSTM(input_size=289, hidden_size=300, bidirectional = True)
         self.fc2 = nn.Linear(600, 19)
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     """
     Forward pass for BiLSTM
@@ -34,8 +35,8 @@ class BiLSTM(nn.Module):
         c0: the initial cell state
     """    
     def forward(self, x, h0=None, c0=None):
-        h0 = torch.randn(2, 1, 300) if h0 == None else h0        
-        c0 = torch.randn(2, 1, 300) if c0 == None else c0  
+        h0 = torch.randn(2, 1, 300).to(self.device) if h0 == None else h0        
+        c0 = torch.randn(2, 1, 300).to(self.device) if c0 == None else c0  
         
         x = self.fc1(x)
         x = F.relu(x)
