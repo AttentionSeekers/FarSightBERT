@@ -35,8 +35,11 @@ class BiLSTM(nn.Module):
         c0: the initial cell state
     """    
     def forward(self, x, h0=None, c0=None):
-        h0 = torch.randn(2, 1, 300).to(self.device) if h0 == None else h0        
-        c0 = torch.randn(2, 1, 300).to(self.device) if c0 == None else c0  
+        h0 = torch.randn(2, 1, 300, device=self.device) if h0 == None else h0        
+        c0 = torch.randn(2, 1, 300, device=self.device) if c0 == None else c0  
+        x = x.to(self.device)
+        h0.to(self.device)
+        c0.to(self.device)
         
         x = self.fc1(x)
         x = F.relu(x)

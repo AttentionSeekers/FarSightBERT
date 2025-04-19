@@ -115,14 +115,18 @@ class TrainingPipeline:
     def eval_model(self, model, threshold=0.5):
         # spitting out pytorch model from skorch module
         pytorchmodel = model.module_
-        pytorchmodel = pytorchmodel.cpu()  # moving to cpu as I use mps
-        X_test = self.X_test.cpu()
-        y_test = self.y_test.cpu()
+        # pytorchmodel = pytorchmodel.cpu() # moving to cpu as I use mps
+        pytorchmodel.to(self.device)
+        X_test = self.X_test
+        y_test = self.y_test
         
         pytorchmodel.eval() # model in eval mode
         with torch.no_grad():
             logits = pytorchmodel.forward(X_test)
-        y_probs = torch.sigmoid(logits).numpy()
+            
+        X_test = X_test.cpu()
+        y_test = y_test.cpu()
+        y_probs = torch.sigmoid(logits).cpu().numpy()
         y_pred = (y_probs > threshold).astype(int)
 
         _acc = [accuracy_score(y_test[:, i], y_pred[:, i]) for i in range(y_test.shape[1])]
