@@ -24,7 +24,7 @@ class BiLSTM(nn.Module):
         self.fc1  = nn.Linear(input_size, 289)
         self.lstm = nn.LSTM(input_size=289, hidden_size=300, bidirectional = True)
         self.fc2 = nn.Linear(600, 19)
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = 'mps' if torch.backends.mps.is_available() else ('cuda' if torch.cuda.is_available() else 'cpu')
 
     """
     Forward pass for BiLSTM
