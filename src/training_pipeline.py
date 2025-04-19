@@ -34,14 +34,24 @@ class TrainingPipeline:
         self.device = 'mps' if torch.backends.mps.is_available() else ('cuda' if torch.cuda.is_available() else 'cpu')
         self.study = None
         self.test_run_optuna = None
+        self.CLS = True
+        self.save_folder = None
 
     def load_data(self):
         # Load preprocessed data
-        with open("data/X.pkl", "rb") as f:
-            X = pickle.load(f)
+        if self.CLS is True:
+            with open("data/X.pkl", "rb") as f:
+                X = pickle.load(f)
 
-        with open("data/y.pkl", "rb") as f:
-            y = pickle.load(f)
+            with open("data/y.pkl", "rb") as f:
+                y = pickle.load(f)
+        else:
+            print(f'\nLoading mean embeddings. CLS is {self.CLS}.')
+            with open("data/X_MEAN.pkl", "rb") as f:
+                X = pickle.load(f)
+
+            with open("data/y_MEAN.pkl", "rb") as f:
+                y = pickle.load(f)
         print('Data loaded successfully.')
 
         # create test train split
@@ -83,9 +93,11 @@ class TrainingPipeline:
             )
 
         net.fit(X=self.X_train, y=self.y_train) 
-
-        # Save trained model to use it later in mixture of model architecture
-        net.save_params(f_params=f'trained_models/{type(model).__name__}.pkl')
+        
+        self.save_folder = 'cls_embeddings' if self.CLS is True else 'mean_embeddings'
+        save_name = f"{type(model).__name__}_{'CLS' if self.CLS else 'MEAN'}"
+        print(f'\nSaving model at trained_models/{self.save_folder}/{save_name}.pkl')
+        net.save_params(f_params=f'trained_models/{self.save_folder}/{save_name}.pkl')
 
     def calculate_acc(self, net, ds, y):
         y_true = np.stack([y.cpu().numpy() for _,y in ds]).astype(int)
