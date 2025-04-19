@@ -100,20 +100,28 @@ class TrainingPipeline:
 
         return np.mean(per_class_acc)
 
-    def eval_model(self, model, threshold=0.6):
-        logits = model.predict(self.X_test)
-        y_probs = torch.sigmoid(torch.tensor(logits)).numpy()
+    def eval_model(self, model, threshold=0.5):
+        # spitting out pytorch model from skorch module
+        pytorchmodel = model.module_
+        pytorchmodel = pytorchmodel.cpu()  # moving to cpu as I use mps
+        X_test = self.X_test.cpu()
+        y_test = self.y_test.cpu()
+        
+        pytorchmodel.eval() # model in eval mode
+        with torch.no_grad():
+            logits = pytorchmodel.forward(X_test)
+        y_probs = torch.sigmoid(logits).numpy()
         y_pred = (y_probs > threshold).astype(int)
 
-        _acc = [ accuracy_score(self.y_test[:, i], y_pred[:, i]) for i in self.y_test.shape[1]]
-        _mcc = [ matthews_corrcoef(self.y_test[:, i], y_pred[:, i]) for i in self.y_test.shape[1]]
+        _acc = [accuracy_score(y_test[:, i], y_pred[:, i]) for i in range(y_test.shape[1])]
+        _mcc = [matthews_corrcoef(y_test[:, i], y_pred[:, i]) for i in range(y_test.shape[1])]
 
         results = {
             'ACC': np.mean(_acc),
             'MCC': np.mean(_mcc),
-            'F1': f1_score(self.y_test, y_pred, average='weighted'),
-            'AUPRC': average_precision_score(self.y_test, y_probs),
-            'AUROC': roc_auc_score(self.y_test, y_probs)
+            'F1': f1_score(y_test, y_pred, average='weighted'),
+            'AUPRC': average_precision_score(y_test, y_probs),
+            'AUROC': roc_auc_score(y_test, y_probs)
         }
 
         return results
