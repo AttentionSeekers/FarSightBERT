@@ -28,7 +28,7 @@ class ConvLSTM(nn.Module):
         self.fc2 = nn.Linear(19 * 225, 289)
         self.lstm = nn.LSTM(289, 300)
         self.fc3 = nn.Linear(300, 19)
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = 'mps' if torch.backends.mps.is_available() else ('cuda' if torch.cuda.is_available() else 'cpu')
 
     """
     Forward pass for ConvLSTM
