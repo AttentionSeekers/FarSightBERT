@@ -61,6 +61,12 @@ However, given the unstructured and highly variable nature of nursing notes whic
 Therefore, we generate two sets of data: one based on [CLS] tokens and the other with mean pooled tokens to perform our downstream task.
 
 == Model description
+#figure(
+  placement: auto,
+  scope: "parent",
+  image("images/models.png", width: 75%),
+  caption: [Deep neural architectures used in the study. Taken from the FarSight @farsight-orig paper.],
+) <model>
 // – Includes a citation to the original paper
 // – Includes link to the original paper’s repo (if
 // applicable)

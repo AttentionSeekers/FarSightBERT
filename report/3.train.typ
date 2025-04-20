@@ -1,12 +1,5 @@
 #figure(
-  placement: auto,
-  scope: "parent",
-  image("images/models.png", width: 75%),
-  caption: [Deep neural architectures used in the study. Taken from the FarSight @farsight-orig paper.],
-) <model>
-
-#figure(
-  placement: auto,
+  placement: top,
   scope: "parent",
   image("images/moe_model.png", width: 75%),
   caption: [A hetrogeneous MoE model architecture.Input data is processed in parallel by multiple expert networks. The gating network assigns dynamic weights to each expert's output which are then combined via weighted summation to produce the final prediction. Pretrained models are frozen, and only gating network is fine-tuned to learn which expert contributes most to the output.],
