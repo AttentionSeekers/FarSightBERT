@@ -79,7 +79,7 @@ Therefore, we generate two sets of data: one based on [CLS] tokens and the other
 // – Others: whether the model is pretrained, Monte
 // Carlo simulation for uncertainty analysis, etc
 
-The referred FarSight paper @farsight-orig discusses various models viz. MLP, ConvNet, LSTM, Bi-LSTM, Conv-LSTM, Seg-GRU and evaluate their performance on unstructured clinical nursing notes. In this paper, we chose top 3 performing models from original paper i.e. Conv-LSTM, Bi-LSTM and ConvNet and simple MLP architecture. Conv-LSTM  have consistently highest performance as seen for multiple metrics and on various type of embeddings viz. Doc2Vec, NMF-BoW, NMF-TW etc.. followed by ConvNet and Bi-LSTM. All these architecture models are discussed below:
+The referred FarSight paper @farsight-orig discusses various models viz. MLP, ConvNet, LSTM, Bi-LSTM, Conv-LSTM, Seg-GRU and evaluate their performance on unstructured clinical nursing notes. In this paper, we choose the top 3 performing models from original paper i.e. Conv-LSTM, Bi-LSTM and ConvNet and simple MLP architecture. Conv-LSTM  have consistently highest performance as seen for multiple metrics and on various type of embeddings viz. Doc2Vec, NMF-BoW, NMF-TW etc.. followed by ConvNet and Bi-LSTM. All these architecture models are discussed below.
 
 
 == Bi-LSTM
@@ -108,22 +108,25 @@ In the context of clinical nursing notes, where the semantic meaning of terms is
 
 In our implementation, we have fixed the architecture as shared in @farsight-orig. A schematic overview of the architecture is presented in the accompanying image. The Bi-LSTM model is configured with the following specifications:
 
-- *Number of Layers:* 1
-- *Hidden State Size:* 150
-- *Embedding Layer:* A fully connected layer is placed before the Bi-LSTM module to reduce the dimensionality of BERT's 768-dimensional contextualized embeddings to 289 while retaining maximum semantic information.
-- *Output Layer:* Another fully connected layer is added after the Bi-LSTM module to process the output.
+- *Number of LSTM layers:* 1
+- *Linear Layer:* A fully connected layer reduces the $768$ dimensional BioBERT embeddings to a latent space of $289$ dimensions. This layer acts like a dimensional reduction step while aiming to retain semantic richness, i.e. extract most information from $768$ input dimension.
+- *Hidden State Size:* $300$ units per direction, resulting in a total of $600$ when combined due to bidirectionality.
+- *Bi-LSTM Module:* A single-layer bidirectional LSTM processes the reduced embeddings to capture both forward and backward contextual dependencies.
+- *Embedding Layer:* A fully connected layer is placed before the Bi-LSTM module to reduce the dimensionality of BERT's $768$ dimensional contextualized embeddings to $289$ while retaining maximum semantic information.
+- *Output Layer:* A final fully connected layer maps the 600-dimensional BiLSTM to $19$ output classes.
 
 == ConvNet, Convolutional Neural Network
 CNN has proven to be an efficient architecture to process image data. CNN utilizes convolving filters (kernels) to extract meaningful features from input data. We extend these capabilities of CNN to textual modality. Each filter is responsible for extracting one feature; multiple filters can be combined to fetch multiple features. 
 
-Under the hood, the input is a 768-dimensional vector derived from BERT embeddings. A convolution operation involving a filter is applied to a window of h terms to produce a new feature. This features are applied to every possible window of terms in embeddings.
+Under the hood, the input is a 768-dimensional vector derived from BioCLinicalBERT embeddings. A convolution operation involving a filter is applied to a window of $h$ terms to produce a new feature. This features are applied to every possible window of terms in embeddings.
 
 The ConvNet architecture used in this study is configured as follows:
 
-- *Input Layer:* Accepts 768-dimensional BERT embeddings and transforms it 289-dimensional while retaining maximum semantic information.
-- *Convolutional Layer:* Applies 19 filters of size 3 with stride 1
-- *Activation Function:* ReLU is applied after the convolutional layer.
-- *Output Layer:* Output feature map is flattened and passed through a fully connected layer to produce the final probabilities across 19 target classes.
+- *Input Layer:* A fully connected layer reduces the 768-dimensional BioBERT embeddings to a latent space of $289$ dimensions. This layer acts like a dimensional reduction step while aiming to retain maximum semantic information.
+- *Reshaping step:* The $289$ dimensional vector is reshaped into a 2D grid of shape $(1,17,17)$ to simulate a spatial structure for 2D convolution. This is purely a data wrangling step for 2D convolution and does not reflect any real spatial locality.
+- *Convolutional Layer:* A 2D convolution layer applies 19 filters of size $3\x3$ with stride 1 producing $19$ feature maps.
+- *Activation Function:* ReLU is applied after the convolutional layer to introduce non-linearity and promote sparse activation.
+- *Output Layer:* Output feature maps are flattened and passed through a fully connected layer to produce the logits to output 19 target classes.
 
 This architecture is particularly effective for capturing local dependencies in textual data, making it well-suited for analyzing clinical nursing notes. The ConvNet model complements the Bi-LSTM by focusing on local patterns, while the Bi-LSTM captures long-term dependencies.
 
@@ -131,8 +134,9 @@ This architecture is particularly effective for capturing local dependencies in 
 As described in ConvNet, convolutional layer extracts high level features from given BERT embeddings of clinical nursing notes. But it cannot capture long term dependencies in nursing notes. The idea for this architecture is to capture the capabilities of Convolution and LSTM. The hybrid architecture is efficient in capturing high level features as well as retains long term dependencies.
 
 The ConvLSTM architecture used in this study is configured as follows:
-- *Input Layer:*  Accepts 768-dimensional BERT embeddings and transforms it 289-dimensional while retaining maximum semantic information.
-- *Convolutional Layer:* Applies 19 filters of kernel size 3 on (17 x 17) size input with stride 1 and extracts 19 feature maps
-- *Intermediate Linear Layer:* Accepts 19 flattened feature maps and transforms those to 289-dimensional latent space.
-- *LSTM:* LSTM module with 1 layer, 300-dimension hidden tensors
-- *Output Layer:* Output from LSTM module is passed through a fully connected layer to produce the final probabilities across 19 target classes.
+- *Input Layer:*  A fully connected layer reduces the $768$ dimensional BioBERT embeddings to a latent space of $289$ dimensions. This layer acts like a dimensional reduction step while aiming to retain maximum semantic information.
+- *Reshaping step:* The $289$ dimensional vector is reshaped into a 2D grid of shape $(1,17,17)$ to simulate a spatial structure for 2D convolution. This is purely a data wrangling step for 2D convolution and does not reflect any real spatial locality.
+- *Convolutional Layer:* A 2D convolution layer applies 19 filters of size $3\x3$ with stride 1 producing $19$ feature maps.
+- *Intermediate Linear Layer:* Accepts $19$ flattened feature maps and transforms those to $289$ dimensional latent space.
+- *LSTM Module:* The resulting $289$ dimensional vector is reshaped to a 3D tensor and passed through a single layer LSTM with a hidden state size of $300$. Although the input is non-sequential, the LSTM acts as a non-linear aggregator enabling richer interactions across transformed feature space.
+- *Output Layer:* Output from LSTM module is passed through a fully connected layer to produce the produce the logits to output 19 target classes.
