@@ -1,4 +1,4 @@
-= Evaluation
+= Evaluation Metrics
 // Evaluation
 // • Please use LLMs to help identify and write code for
 // metrics and evaluations.
@@ -8,3 +8,4 @@
 // relevant and helpful was the LLM? How many
 // prompts did you use? If the initial prompt did
 // not work, what was wrong with it?(In appendix)
+
