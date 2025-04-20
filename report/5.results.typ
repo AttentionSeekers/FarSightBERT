@@ -18,3 +18,36 @@
 // extension(s) and validate them. Include results and
 // a discussion
 
+#figure(
+  placement: top,
+  scope: "parent",
+  caption: [Performance metrics across classifiers],
+  text(size: 11pt)[
+    #table(
+      columns: 7,
+      align: horizon,
+      inset: 9pt,
+      table.header(
+        [*Data Model*], [*Classifier*], [*ACC*], [*MCC*], [*F1*], [*AUPRC*], [*AUROC*]
+      ),
+
+      table.cell(rowspan: 4)[*NMF-TW with SC* \ (from the paper)], [*MLP*],[],[],[],[],[],
+                                              [*LSTM*],[],[],[],[],[],
+                                              [*BiLSTM*],[],[],[],[],[],
+                                              [*ConvNet*],[],[],[],[],[],
+      table.cell(rowspan: 4)[*BERT [CLS] Token*], [*MLP*],[],[],[],[],[],
+                                              [*LSTM*],[],[],[],[],[],
+                                              [*BiLSTM*],[],[],[],[],[],
+                                              [*ConvNet*],[],[],[],[],[],
+      table.cell(rowspan: 4)[*BERT Mean Pooling*], [*MLP*],[],[],[],[],[],
+                                              [*LSTM*],[],[],[],[],[],
+                                              [*BiLSTM*],[],[],[],[],[],
+                                              [*ConvNet*],[],[],[],[],[],
+
+
+    ),
+  ],
+)<farsight-results>
+
+
+
