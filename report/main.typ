@@ -5,8 +5,7 @@
 #show: ieee.with(
   title: [FarSightBERT:  Enhanced Embeddings for Long-Term Disease Prediction],
   abstract: [
-    //TODO
-    ???
+    The FarSight paper by Gangavarapu et al @farsight-orig demonstrated the value of unstructured clinical notes for long-term disease prediction showcasing how rich patient-specific information is often lost in structued EHR data. Building upon their innovative FarSight aggregation technique, we explore two significant extensions to their approach: use of transformer-based embeddings and mixture of expert models.
   ],
   authors: (
     (
@@ -22,9 +21,8 @@
       email: "trathi9@gatech.edu"
     ),
   ),
-  github-repo: "https://github.gatech.edu/nkapila6/nlpvise",
-  index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax", "Clinical decision support systems", "Disease prediction", "Healthcare analytics", "ICD-9 code group prediction", "Precision medicine"),
-  // index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax"), //TODO
+  github-repo: "https://github.gatech.edu/nkapila6/FarSightBERT",
+  index-terms: ("Clinical decision support systems", "Disease prediction", "Healthcare analytics", "ICD-9 code group prediction", "Precision medicine"),
   bibliography: bibliography("bibs/refs.bib"),
   figure-supplement: [Fig.],
 )
