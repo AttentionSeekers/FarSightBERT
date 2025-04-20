@@ -21,7 +21,7 @@ Our experiments were conducted on an Apple M1 Pro and CPU hardware configuration
 
 The extraction of FP32 embeddings for both CLS token and mean pooling methods took approximately 1.5 hours each on an Apple M1 Pro.
 
-== Training details
+== Training details <sec-training>
 // • Includes Training Details
 // – Loss functions
 // – Please use LLMs to help write code for the training
@@ -63,4 +63,8 @@ $ "BCEWithLogitsLoss" = \
     - $sigma(z_{i,c})$: Sigmoid function applied to logit $z_{i,c}$.
     - $w_c$: Optional weight for class $c$ (e.g., `pos_weight` to handle class imbalance).
 
+== Mixture of Experts (MoE) training
+Our training procedure follows a two-phase approach. In the first phase (as seen in @sec-training), we independtly train four expert models on two different BioCLinicalBERT embeddings variants. 
+Once these expert models have been trained, we freeze their parameters to preserve their specialized knowledge. In the scond phase, the frozen expert models are integrated with a trainable gating network as seen in @fig-moe-model. The gating network consists of a shallow neural network that takes same BioClinicalBERT embeddings as input and outputs a distribution of weights across the expert models.
 
+During this second phase of training, only parameters of gating network are updated while expert models are fixed. The final prediction is a weighted sum of the expert outputs with weights determined by the gating network. We continue to use binary cross-entropy loss with logits, maintaining consistency with our individual model training. This approach allows the gating network to learn which expert(s) to trust for different types of clinical notes, effectively creating a dynamic ensemble that outperforms any individual model.
