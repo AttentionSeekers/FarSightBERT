@@ -69,10 +69,57 @@ Mapped ICD-9 diagnostic codes into 19 distinct diagonistic groups based on code 
 
 The referred FarSight paper @farsight-orig discusses various models viz. MLP, ConvNet, LSTM, Bi-LSTM, Conv-LSTM, Seg-GRU and evaluate their performance on unstructured clinical nursing notes. In this paper, we chose top 3 performing models from original paper i.e. Conv-LSTM, Bi-LSTM and ConvNet and simple MLP architecture. Conv-LSTM  have consistently highest performance as seen for multiple metrics and on various type of embeddings viz. Doc2Vec, NMF-BoW, NMF-TW etc.. followed by ConvNet and Bi-LSTM. All these architecture models are discussed below:
 
-== Long Short Term Memory, LSTM
- LSTM is a special RNN that effectively solves the vanishing gradient problem observed in trivial RNN. These units are suitable to capture long term dependencies and understand context in long inputs; which is important to understand these clinical notes and make predictions. The gating mechanism in LSTM takes care of maintaining current cell state c#sub[t] and prev cell state c#sub[t-1].
+== Bi-LSTM
+LSTM (Long Short-Term Memory) is a type of Recurrent Neural Network (RNN) designed to address the vanishing gradient problem commonly observed in traditional RNNs. 
 
+The LSTM architecture includes a gating mechanism that regulates the flow of information through the network. These gates include:
 
+- *Forget Gate (f):* Decides which information to discard from the previous cell state.
+- *Input Gate (i):* Determines which new information to update in the cell state.
+- *Cell State (c):* Maintains the memory of the network, updated by the forget and input gates.
+- *Output Gate (o):* Controls the output of the current cell state.
 
+The LSTM model processes the input sequence step-by-step, maintaining a current cell state c#sub[t] and a hidden state h#sub[t] at each time step. These states are influenced by the previous cell state c#sub[t-1] and hidden state h#sub[t-1], allowing the model to retain semantic meaning over long sequences. This capability is particularly important for clinical notes, where the meaning of terms is often influenced by preceding terms. However, the LSTM outputs only considers the past inputs for generating output.
 
-// TODO(@trathi9): Leaving this part for you.
+Bi-LSTM (Bidirectional Long Short-Term Memory) extends the capabilities of LSTM by processing the input sequence in both forward and backward directions. This allows the model to capture context from both past and future terms, which is particularly beneficial for understanding the semantic meaning of terms in nursing notes.
+
+The Bi-LSTM architecture consists of two LSTM layers:
+
+- *Forward LSTM:* Processes the input sequence from the beginning to the end, capturing past dependencies.
+- *Backward LSTM:* Processes the input sequence in reverse, capturing future dependencies.
+
+The outputs from both the forward and backward LSTMs are concatenated at each time step to form a comprehensive representation of the input sequence. 
+// This bidirectional approach enables the model to better understand the context of terms, as their meaning often depends on both preceding and succeeding terms.
+
+In the context of clinical nursing notes, where the semantic meaning of terms is influenced by their surrounding context, Bi-LSTM provides a significant advantage over unidirectional LSTMs. By leveraging information from both directions, Bi-LSTM improves the model's ability to make accurate predictions based on the input data.
+
+In our implementation, we have fixed the architecture as shared in @farsight-orig. A schematic overview of the architecture is presented in the accompanying image. The Bi-LSTM model is configured with the following specifications:
+
+- *Number of Layers:* 1
+- *Hidden State Size:* 150
+- *Embedding Layer:* A fully connected layer is placed before the Bi-LSTM module to reduce the dimensionality of BERT's 768-dimensional contextualized embeddings to 289 while retaining maximum semantic information.
+- *Output Layer:* Another fully connected layer is added after the Bi-LSTM module to process the output.
+
+== ConvNet, Convolutional Neural Network
+CNN has proven to be an efficient architecture to process image data. CNN utilizes convolving filters (kernels) to extract meaningful features from input data. We extend these capabilities of CNN to textual modality. Each filter is responsible for extracting one feature; multiple filters can be combined to fetch multiple features. 
+
+Under the hood, the input is a 768-dimensional vector derived from BERT embeddings. A convolution operation involving a filter is applied to a window of h terms to produce a new feature. This features are applied to every possible window of terms in embeddings.
+
+The ConvNet architecture used in this study is configured as follows:
+
+- *Input Layer:* Accepts 768-dimensional BERT embeddings and transforms it 289-dimensional while retaining maximum semantic information.
+- *Convolutional Layer:* Applies 19 filters of size 3 with stride 1
+- *Activation Function:* ReLU is applied after the convolutional layer.
+- *Output Layer:* Output feature map is flattened and passed through a fully connected layer to produce the final probabilities across 19 target classes.
+
+This architecture is particularly effective for capturing local dependencies in textual data, making it well-suited for analyzing clinical nursing notes. The ConvNet model complements the Bi-LSTM by focusing on local patterns, while the Bi-LSTM captures long-term dependencies.
+
+== Conv-LSTM
+As described in ConvNet, convolutional layer extracts high level features from given BERT embeddings of clinical nursing notes. But it cannot capture long term dependencies in nursing notes. The idea for this architecture is to capture the capabilities of Convolution and LSTM. The hybrid architecture is efficient in capturing high level features as well as retains long term dependencies.
+
+The ConvLSTM architecture used in this study is configured as follows:
+- *Input Layer:*  Accepts 768-dimensional BERT embeddings and transforms it 289-dimensional while retaining maximum semantic information.
+- *Convolutional Layer:* Applies 19 filters of kernel size 3 on (17 x 17) size input with stride 1 and extracts 19 feature maps
+- *Intermediate Linear Layer:* Accepts 19 flattened feature maps and transforms those to 289-dimensional latent space.
+- *LSTM:* LSTM module with 1 layer, 300-dimension hidden tensors
+- *Output Layer:* Output from LSTM module is passed through a fully connected layer to produce the final probabilities across 19 target classes.
