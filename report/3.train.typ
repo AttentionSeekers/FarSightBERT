@@ -64,7 +64,7 @@ $ "BCEWithLogitsLoss" = \
     - $w_c$: Optional weight for class $c$ (e.g., `pos_weight` to handle class imbalance).
 
 == Mixture of Experts (MoE) training
-Our training procedure follows a two-phase approach. In the first phase (as seen in @sec-training), we independtly train four expert models on two different BioCLinicalBERT embeddings variants. 
-Once these expert models have been trained, we freeze their parameters to preserve their specialized knowledge. In the scond phase, the frozen expert models are integrated with a trainable gating network as seen in @fig-moe-model. The gating network consists of a shallow neural network that takes same BioClinicalBERT embeddings as input and outputs a distribution of weights across the expert models.
+Our training procedure follows a two-phase approach. In the first phase (as seen in @sec-training), we independently train four expert models on two different BioCLinicalBERT embeddings variants. 
+Once these expert models have been trained, we freeze their parameters to preserve their specialized knowledge. In the second phase, the frozen expert models are integrated with a trainable gating network as seen in @fig-moe-model. The gating network consists of a shallow neural network that takes same BioClinicalBERT embeddings as input and outputs a distribution of weights across the expert models.
 
 During this second phase of training, only parameters of gating network are updated while expert models are fixed. The final prediction is a weighted sum of the expert outputs with weights determined by the gating network. We continue to use binary cross-entropy loss with logits, maintaining consistency with our individual model training. This approach allows the gating network to learn which expert(s) to trust for different types of clinical notes, effectively creating a dynamic ensemble that outperforms any individual model.

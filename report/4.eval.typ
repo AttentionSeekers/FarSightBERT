@@ -8,8 +8,7 @@
 // 
 It is crucial to select appropriate metric to access the performance of model. The choice of metric depends heavily on the nature of problem and characterstics of dataset (e.g., balanced vs imbalanced). Since our ICD-9 dataset is imbalanced in nature, we followed the approach in the FarSight paper and selected various standard classification evaluation metrics suited for multil-label and imbalanced datasets.
 
-- *Accuracy:* Measures the proportion of correctly predicted labels out of the total labels. 
-However, for imbalanced datasets, accuracy can be misleading as it does not account for the distribution of classes.
+- *Accuracy:* Measures the proportion of correctly predicted labels out of the total labels.  However, for imbalanced datasets, accuracy can be misleading as it does not account for the distribution of classes.
 
 - *Matthews Correlation Coefficient (MCC):* A balanced measure that takes into account true and false positives and negatives. It is especially useful for imbalanced datasets as it provides a single score that evaluates the quality of binary classifications. The MCC value ranges from -1 to +1, 
   - +1 indicates a perfect prediction
