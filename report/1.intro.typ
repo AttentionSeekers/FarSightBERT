@@ -4,15 +4,13 @@
 // paper is about and what is its contribution to the wider
 // research space. Cite the original paper.
 
-The FarSight paper @farsight-orig addresses the problem of predicting diseases using unstructured clinical notes. The premise of that paper was that while most models use electronic health records (EHR) data to model on, valuable information exists in unstructured clinical notes. The authors Gangavarapu et al develop a long-term aggregation mechanism to capture onset of diseases from earliest recorded systems.
+The healthcare industry generates vast amounts of clinical data ranging from structured electronic health records (EHR) to unstructured clinical narratives @ehr-data. Focus of predictive modeling on clinical data has been in the EHR landscape. Unstructured text especially nursing notes contains rich, patient-specific information, captures nuanced observations are ignored in predictive modeling tasks.
 
-\
-The core contributions of the FarSight were:
-- Novel aggregation mechanism to identify earliest signs of disease.
-- The fact that unstructured nursing notes can be a valuable data source.
+Gangavarapu et al.'s FarSight @farsight-orig aggregation approach is an advancement in modeling unstructured nursing notes for disease prediction. Their work demonstrated how nursing notes when properly cleaned and aggregated can predict ICD-9 diagnostic codes with remarkable accuracy. The key idea of their FarSight aggregation mechanism was the ability to associate early clinical observations with eventual diagnoses which enabled detection of diseases at their earliest manifestations.
 
-\
-We try to extend these contributions by ??? /*TODO: add plug here.*/
+As artificial intelligence in the text modality has continued to evolve, new opportunities emerge to enhance these approaches. In this study, we build upon the foundation laid out by FarSight and we can further advance use of unstructured clinical narratives for disease prediction. We investigate whether modern transformer-based language models like BioCLinicalBERT pre-trained on a vast corpora of biomedical text can offer richer semantic representations than document embedding techniques used in the original FarSight study. Furthermore, advances in neural architecture design especially mixture of expert models, present new posibilites for creating interpretable and efficient prediction systems.
+
+Our work contributes to ongoing effort to develop more sophisticated clinical systems that can leverage full spectrum of available patient data by combining FarSight's aggregation model with cutting-edge language models and neural architectures.
 
 = Scope of Reproducibility and Novelty
 // List all hypotheses from the paper you will test and
