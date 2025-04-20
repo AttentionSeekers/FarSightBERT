@@ -20,7 +20,7 @@
   ),
   more-details: "yeye",
   github-repo: "https://github.gatech.edu/nkapila6/FarSightBERT",
-  video-link: "https://youtube.com/",
+  video-link: "https://www.youtube.com/watch?v=-NYIgPllGl8",
   data-link: "https://drive.google.com/drive/folders/1J6qucEdfXWc78Q_7gjC3Z_qM4ObGMfnE?usp=sharing",
   index-terms: ("Clinical decision support systems", "Disease prediction", "Healthcare analytics", "ICD-9 code group prediction", "Precision medicine"),
   bibliography: bibliography("bibs/refs.bib"),

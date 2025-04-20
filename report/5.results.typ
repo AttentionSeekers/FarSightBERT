@@ -1,3 +1,23 @@
+#figure(
+  placement: top,
+  scope: "parent",
+  grid(
+    columns: 2,
+      [
+        #figure(
+          image("../plots/moe-cls-usage/expert_usage_all_epochs.png", width: 75%),
+          caption: [Expert usage across epochs w/ models trained on CLS embeddings]
+        ) <expert-usage-cls>
+      ],
+      [
+        #figure(
+          image("../plots/moe-mean-usage/expert_usage_all_epochs.png", width: 75%),
+          caption: [Expert usage across epochs w/ models trained on Mean embeddings]
+        ) <expert-usage-moe>
+      ]
+  )
+)
+
 = Results
 // Report results for all experiments that you run:
 // – specific numbers (accuracy, AUC, RMSE, etc)
@@ -71,24 +91,3 @@ The results demonstrate that despite the general success of transformer models l
     ),
   ],
 )<farsight-results>
-
-#figure(
-  placement: top,
-  scope: "parent",
-  grid(
-    columns: 2,
-      [
-        #figure(
-          image("../plots/moe-cls-usage/expert_usage_all_epochs.png", width: 75%),
-          caption: [Expert usage across epochs w/ models trained on CLS embeddings]
-        ) <expert-usage-cls>
-      ],
-      [
-        #figure(
-          image("../plots/moe-mean-usage/expert_usage_all_epochs.png", width: 75%),
-          caption: [Expert usage across epochs w/ models trained on Mean embeddings]
-        ) <expert-usage-moe>
-      ]
-  )
-)
-
