@@ -17,6 +17,23 @@
 // – Use LLMs to help implement your planned
 // extension(s) and validate them. Include results and
 // a discussion
+NMF-TW with SC (FarSight Aggregation)  is clearly the best performing approach across all metrics.
+Both CLS token and mean pooling variations of BioClinicalBERT show noticeably lower performance than the NMF-TW with SC approach. Furthermore, CLS token slightly underperforms mean pooling on most metrics and Mean pooling shows modest improvements in MCC scores and AUROC
+
+Below are some important inferences: 
+- *Domain-specific representation matters:* Referring @farsight-results, it is inevitable that domain-adapted NMF-TW with SC outperforms the pre trained BioClinicalBERT embeddings, even though BioClinicalBERT is specifically pre-trained on all MIMIC notes. This suggests that NMF-TW with SC model captured rich information in the informally-written nursing notes needed for classifier to learn and generalize; better compared to BioClinicalBERT @bio_clinicalbert.
+
+- *FarSight aggregation provides crucial advantage: * The results @farsight-results confirms the hypothesis and core promise mentioned in @farsight-orig that Farsight aggregation mechanism substantially provides capability to model to detect the diseases at on-set from the unstructured clinical notes.
+
+- *MCC divergence:* The most dramatic difference observed in original paper @farsight-orig and @farsight-results is, huge divergence in MCC scores i.e. 64.59% for best NMF-TW model vs 29.12% for best BioClinicalBERT model. This indicates the NMF-TW approach is particularly strong at handling the class imbalance in the ICD-9 dataset.
+
+- *Mean v/s CLS embeddings:* For BioClinicalBERT, it is observed that models trained on Mean embeddings consitently outperforms models trained on Mean Embeddings. This indicates that averaging all token provides more comprehensive and complete clinical information then relying on CLS token alone.
+
+- *MoE outperforms individual models:* It is observed that Mixture of Experts model consistently outperforms individual neural architectures when trained on both CLS token and Mean pooling embeddings. This suggests that different experts are successfully specializing in different aspects of the prediction task. The expert usage plots @expert-usage-cls and @expert-usage-moe show clear specialization patterns, with distinct experts being consistently activated for different input patterns throughout training.
+  - For MoE on Mean embeddings, BiSLTM is specialist for $~60%$ of ICD-9 classification task followed by ConvLSTM and ConvNet. Mean embeddings provide better representation of clinical information and BiLSTM considers both past and future dependencies, thus combining the best of both.
+  - For MoE on CLS embeddings, ConvNet is specialist for $~50%$ of ICD-9 classification task followed by BiLSTM and ConvLSTM. CLS embeddings provide summarized representation of clinical note and ConvNet's ability to capture local patterns proves most effective.
+
+The results demonstrate that despite the general success of transformer models like BERT in NLP tasks, specialized approaches like NMF topic modeling with the FarSight aggregation mechanism can significantly outperform them for specific clinical prediction tasks, particularly when dealing with imbalanced data. Also, MoE can outperform individual neural networks.
 
 #figure(
   placement: top,
@@ -52,5 +69,19 @@
   ],
 )<farsight-results>
 
-
+#grid(
+  columns: 2,
+    [
+      #figure(
+        image("../plots/moe-cls-usage/expert_usage_all_epochs.png", width: 95%),
+        caption: [Expert usage across epochs w/ models trained on CLS embeddings]
+      ) <expert-usage-cls>
+    ],
+    [
+      #figure(
+        image("../plots/moe-mean-usage/expert_usage_all_epochs.png", width: 95%),
+        caption: [Expert usage across epochs w/ models trained on Mean embeddings]
+      ) <expert-usage-moe>
+    ]
+)
 
