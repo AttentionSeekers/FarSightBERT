@@ -47,3 +47,5 @@
 
 // authors contribs
 #include "7.authors-contrib.typ"
+
+#include "8.appendix.typ"
