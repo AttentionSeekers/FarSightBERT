@@ -56,5 +56,12 @@ Mapped ICD-9 diagnostic codes into 19 distinct diagonistic groups based on code 
 // – Others: whether the model is pretrained, Monte
 // Carlo simulation for uncertainty analysis, etc
 
-We use many different architectures in the FarSight paper.
+The referred FarSight paper @farsight-orig discusses various models viz. MLP, ConvNet, LSTM, Bi-LSTM, Conv-LSTM, Seg-GRU and evaluate their performance on unstructured clinical nursing notes. In this paper, we chose top 3 performing models from original paper i.e. Conv-LSTM, Bi-LSTM and ConvNet and simple MLP architecture. Conv-LSTM  have consistently highest performance as seen for multiple metrics and on various type of embeddings viz. Doc2Vec, NMF-BoW, NMF-TW etc.. followed by ConvNet and Bi-LSTM. All these architecture models are discussed below:
+
+== Long Short Term Memory, LSTM
+ LSTM is a special RNN that effectively solves the vanishing gradient problem observed in trivial RNN. These units are suitable to capture long term dependencies and understand context in long inputs; which is important to understand these clinical notes and make predictions. The gating mechanism in LSTM takes care of maintaining current cell state c#sub(t) and prev cell state c#sub(t-1).
+
+
+
+
 // TODO(@trathi9): Leaving this part for you.
