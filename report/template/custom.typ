@@ -2,7 +2,10 @@
 #let ieee(
   title: [Paper Title],
   authors: (),
-  github-repo: none, // New parameter for GitHub repository
+  more-details: none,
+  github-repo: none, // parameter for GitHub repository
+  data-link: none, // parameter for data
+  video-link: none, // parameter for video
   abstract: none,
   index-terms: (),
   paper-size: "us-letter",
@@ -192,9 +195,27 @@
         }
       }
 
-      if github-repo != none {
+      if more-details != none {
             v(16pt, weak: true)
             align(center, [
+              #text(
+                font: "Courier New",
+                weight: "bold",
+                size: 13pt,
+                fill: blue,
+                // weight: "bold",
+                link(data-link)[Data]
+              )
+              |
+              #text(
+                font: "Courier New",
+                weight: "bold",
+                size: 13pt,
+                fill: blue,
+                // weight: "bold",
+                link(video-link)[Video]
+              )
+              |
               #text(
                 font: "Courier New",
                 weight: "bold",
@@ -205,6 +226,20 @@
               )
             ])
           }
+
+          // if data-link != none {
+          //   v(16pt, weak: true)
+          //   align(center, [
+          //     #text(
+          //       font: "Courier New",
+          //       weight: "bold",
+          //       size: 13pt,
+          //       fill: blue,
+          //       // weight: "bold",
+          //       link(data-link)[Data]
+          //     )
+          //   ])
+          // }
     }
   )
 

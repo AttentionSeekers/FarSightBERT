@@ -1,6 +1,7 @@
 // using custom implementation with repo name under authors.
 #import "template/custom.typ": ieee
-// #import "@preview/charged-ieee:0.1.3": ieee
+// page numbering
+#set page(numbering:"1")
 
 #show: ieee.with(
   title: [FarSightBERT:  Enhanced Embeddings for Long-Term Disease Prediction],
@@ -10,18 +11,17 @@
   authors: (
     (
       name: "Nikhil Kapila",
-      // department: [Co-Founder],
-      // organization: [Typst GmbH],
       email: "nkapila6@gatech.edu"
     ),
     (
       name: "Tejas Rathi",
-      // department: [Co-Founder],
-      // organization: [Typst GmbH],
       email: "trathi9@gatech.edu"
     ),
   ),
+  more-details: "yeye",
   github-repo: "https://github.gatech.edu/nkapila6/FarSightBERT",
+  video-link: "https://youtube.com/",
+  data-link: "https://drive.google.com/drive/folders/1J6qucEdfXWc78Q_7gjC3Z_qM4ObGMfnE?usp=sharing",
   index-terms: ("Clinical decision support systems", "Disease prediction", "Healthcare analytics", "ICD-9 code group prediction", "Precision medicine"),
   bibliography: bibliography("bibs/refs.bib"),
   figure-supplement: [Fig.],
