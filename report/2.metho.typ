@@ -26,7 +26,7 @@ The MIMIC-III v1.4 database consists of 2,083,180 note events out of which 223,5
   placement: top,
   scope: "parent",
   image("images/data_prep.png", width: 100%),
-  caption: [Data cleaning and preprocessing steps as seen in code.],
+  caption: [Data cleaning and preprocessing procedures performed on the MIMIC-III dataset are aligned with the step numbering used in the accompanying codebase available on the GitHub repository.],
 ) <fig-data-preprocess>
 
 == Dataset Preprocessing and Cleaning 
