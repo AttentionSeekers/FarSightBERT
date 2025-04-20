@@ -52,7 +52,13 @@ We apply FarSight's aggregation mechanism to map each nursing note to all ICD-9 
 Mapped ICD-9 diagnostic codes into 19 distinct diagonistic groups based on code ranges defined in @tdrdata_icd9_2016. ICD-9 code range of 760-779 corresponding to neonates (age < 15) are not part of our cohort and excluded in this study. Furthermore all reference and supplemental V-codes are grouped into same code group to lower computational complexity to train.
 
 === BERT embeddings (Clinical Feature Modeling)
-// TODO: copy in stuff from section 2
+We explore two distinct strategies to generate embeddings from BioCLinicalBERT: (1) utilizing [CLS] token representation and implementing mean pooling across all token embeddings. 
+
+We extracted only the final hidden state of the [CLS] token as a 768-dimensional vector representing the entire nursing notes. The [CLS] token is specifically trained during BERT's pretraining to capture sentence-level semantics, i.e. the CLS token gives a summary representation of the entire sequence and is often used for classification tasks in many modeling approaches.
+
+However, given the unstructured and highly variable nature of nursing notes which often contain patient-specific information, we perform a mean pooling across all token embeddings that may offer a more robust representation. This method averages contextual information across the entire sequence, potentially capturing a broader semantic understanding than a single token embedding.
+
+Therefore, we generate two sets of data: one based on [CLS] tokens and the other with mean pooled tokens to perform our downstream task.
 
 == Model description
 // – Includes a citation to the original paper
