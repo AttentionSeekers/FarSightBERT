@@ -1,4 +1,4 @@
-= Methodology
+= Data Methodology
 
 == Dataset description
 // • Dataset description
@@ -51,7 +51,7 @@ We apply FarSight's aggregation mechanism to map each nursing note to all ICD-9 
 === ICD-9 code grouping
 Mapped ICD-9 diagnostic codes into 19 distinct diagonistic groups based on code ranges defined in @tdrdata_icd9_2016. ICD-9 code range of 760-779 corresponding to neonates (age < 15) are not part of our cohort and excluded in this study. Furthermore all reference and supplemental V-codes are grouped into same code group to lower computational complexity to train.
 
-=== BERT embeddings (Clinical Feature Modeling)
+=== BERT embeddings (Clinical Feature Modeling) <bert-embeddings>
 We explore two distinct strategies to generate embeddings from BioCLinicalBERT: (1) utilizing [CLS] token representation and implementing mean pooling across all token embeddings. 
 
 We extracted only the final hidden state of the [CLS] token as a 768-dimensional vector representing the entire nursing notes. The [CLS] token is specifically trained during BERT's pretraining to capture sentence-level semantics, i.e. the CLS token gives a summary representation of the entire sequence and is often used for classification tasks in many modeling approaches.
@@ -60,7 +60,7 @@ However, given the unstructured and highly variable nature of nursing notes whic
 
 Therefore, we generate two sets of data: one based on [CLS] tokens and the other with mean pooled tokens to perform our downstream task.
 
-== Model description
+= Model Methodology
 #figure(
   placement: auto,
   scope: "parent",
@@ -80,6 +80,7 @@ Therefore, we generate two sets of data: one based on [CLS] tokens and the other
 // Carlo simulation for uncertainty analysis, etc
 
 The referred FarSight paper @farsight-orig discusses various models viz. MLP, ConvNet, LSTM, Bi-LSTM, Conv-LSTM, Seg-GRU and evaluate their performance on unstructured clinical nursing notes. In this paper, we chose top 3 performing models from original paper i.e. Conv-LSTM, Bi-LSTM and ConvNet and simple MLP architecture. Conv-LSTM  have consistently highest performance as seen for multiple metrics and on various type of embeddings viz. Doc2Vec, NMF-BoW, NMF-TW etc.. followed by ConvNet and Bi-LSTM. All these architecture models are discussed below:
+
 
 == Bi-LSTM
 LSTM (Long Short-Term Memory) is a type of Recurrent Neural Network (RNN) designed to address the vanishing gradient problem commonly observed in traditional RNNs. 
