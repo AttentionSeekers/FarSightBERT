@@ -140,3 +140,10 @@ The ConvLSTM architecture used in this study is configured as follows:
 - *Intermediate Linear Layer:* Accepts $19$ flattened feature maps and transforms those to $289$ dimensional latent space.
 - *LSTM Module:* The resulting $289$ dimensional vector is reshaped to a 3D tensor and passed through a single layer LSTM with a hidden state size of $300$. Although the input is non-sequential, the LSTM acts as a non-linear aggregator enabling richer interactions across transformed feature space.
 - *Output Layer:* Output from LSTM module is passed through a fully connected layer to produce the produce the logits to output 19 target classes.
+
+== Mixture of Experts (MoE) model
+As seen in @moe-hypo, we employ a Mixture of Experts (MoE) approach to effectively handle the heterogeneity present in clinical nursing notes. Rather than treating all notes identically, we leverage multiple specialized models trained on BioClinicalBERT embeddings, each potentially capturing distinct aspects of the clinical narrative.
+
+The conceptual foundation of our approach draws from the seminal work of @moe-orig, which established that conditionally routing inputs to specialized expert models can improve performance on heterogeneous data. We implement this through a gating network as illustrated in @fig-moe-model, which dynamically determines the optimal weighting of each expert model based on the characteristics of each incoming clinical note.
+
+This adaptive ensemble strategy allows our system to route different types of nursing documentation to the most appropriate expert models. For instance, notes containing primarily vital sign observations might be directed toward one expert, while notes focused on medication responses might be weighted toward another. The gating network learns these routing patterns automatically during training, effectively discovering latent note types and their corresponding optimal prediction strategies without requiring manual categorization.
