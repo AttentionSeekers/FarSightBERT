@@ -21,6 +21,9 @@
   // - See e.g. the definition \def\@IEEEinterspaceratioM{0.35} in IEEEtran.cls
   set text(font: "TeX Gyre Termes", size: 10pt, spacing: .35em)
 
+  // para
+  set par(spacing: 1em)
+
   // Enums numbering
   set enum(numbering: "1)a)i)")
 
